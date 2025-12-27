@@ -100,7 +100,7 @@ fun DemoScreen(
                 )
 
                 Text(
-                    text = "${timeSeconds / 60} min",
+                    text = "$minutes min $timeSeconds s",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
