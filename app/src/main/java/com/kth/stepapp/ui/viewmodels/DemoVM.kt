@@ -22,6 +22,8 @@ interface DemoViewModel {
 
     val caloriesBurned: StateFlow<Int>
 
+    val walkingTimeSeconds: StateFlow<Long>
+
 }
 
 class DemoVM (
@@ -35,6 +37,8 @@ class DemoVM (
     private val _caloriesBurned = MutableStateFlow(0)
     override val caloriesBurned: StateFlow<Int> = _caloriesBurned.asStateFlow()
     private val _walkingTimeSeconds = MutableStateFlow(0L)
+    override val walkingTimeSeconds: StateFlow<Long> = _walkingTimeSeconds.asStateFlow()
+
 
 
     companion object {
@@ -84,4 +88,6 @@ class FakeDemoVM: DemoViewModel {
     override val nrOfSteps = MutableStateFlow(1L)
 
     override val caloriesBurned = MutableStateFlow(180)
+
+    override val walkingTimeSeconds = MutableStateFlow(124L)
 }

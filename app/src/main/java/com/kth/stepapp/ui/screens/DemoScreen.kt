@@ -2,6 +2,7 @@ package com.kth.stepapp.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -32,6 +33,11 @@ fun DemoScreen(
     val steps by vm.nrOfSteps.collectAsState()
 
     val calories by vm.caloriesBurned.collectAsState()
+
+    val timeSeconds by vm.walkingTimeSeconds.collectAsState()
+
+    val minutes = timeSeconds / 60
+
 
     Scaffold(
         topBar = {
@@ -80,6 +86,23 @@ fun DemoScreen(
                 Text(
                     text = "$calories kcal",
                     fontSize = 28.sp
+                )
+
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 24.dp)
+            ) {
+                Text(
+                    text = "Time walking: ",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Text(
+                    text = "${timeSeconds / 60} min",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
