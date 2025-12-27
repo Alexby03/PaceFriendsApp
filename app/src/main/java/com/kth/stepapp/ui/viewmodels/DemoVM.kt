@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kth.stepapp.PaceFriendsApplication
+import com.kth.stepapp.core.services.CaloriesCalculator
 import com.kth.stepapp.core.services.StepCounter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,14 +20,22 @@ interface DemoViewModel {
 
     val nrOfSteps: StateFlow<Long>
 
+    val caloriesBurned: StateFlow<Int>
+
 }
 
 class DemoVM (
-    private val stepCounter: StepCounter
+    private val stepCounter: StepCounter,
+    private val caloriesCalculator: CaloriesCalculator
 ): DemoViewModel, ViewModel() {
 
     private val _nrOfSteps = MutableStateFlow(5678L)
     override val nrOfSteps: StateFlow<Long> = _nrOfSteps.asStateFlow()
+
+    private val _caloriesBurned = MutableStateFlow(0)
+    override val caloriesBurned: StateFlow<Int> = _caloriesBurned.asStateFlow()
+    private val _walkingTimeSeconds = MutableStateFlow(0L)
+
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
@@ -35,7 +44,8 @@ class DemoVM (
                         as PaceFriendsApplication)
 
                 DemoVM (
-                    stepCounter = app.stepCounter
+                    stepCounter = app.stepCounter,
+                    caloriesCalculator = CaloriesCalculator()
                 )
             }
         }
@@ -43,6 +53,14 @@ class DemoVM (
 
     init {
         Log.d("DemoVM", "ViewModel INIT started!")
+
+        // 1️⃣ Walking time counter (1 second tick)
+        viewModelScope.launch {
+            while (true) {
+                kotlinx.coroutines.delay(1_000)
+                _walkingTimeSeconds.value += 1
+            }
+        }
 
         viewModelScope.launch {
             Log.d("DemoVM", "Coroutine launched, waiting for sensor...")
@@ -53,12 +71,17 @@ class DemoVM (
                 .collect { steps ->
                     Log.d("DemoVM","NR OF STEPS $steps")
                     _nrOfSteps.value = steps
+                    _caloriesBurned.value = caloriesCalculator.calculateCalories(
+                        steps,
+                        walkingTimeSeconds = _walkingTimeSeconds.value
+                    )
                 }
         }
     }
-
 }
 
 class FakeDemoVM: DemoViewModel {
     override val nrOfSteps = MutableStateFlow(1L)
+
+    override val caloriesBurned = MutableStateFlow(180)
 }

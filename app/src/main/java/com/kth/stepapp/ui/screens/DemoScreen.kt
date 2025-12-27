@@ -31,6 +31,8 @@ fun DemoScreen(
 ) {
     val steps by vm.nrOfSteps.collectAsState()
 
+    val calories by vm.caloriesBurned.collectAsState()
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -63,6 +65,21 @@ fun DemoScreen(
                 Text(
                     text = steps.toString(),
                     fontSize = 32.sp,
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 24.dp)
+            ) {
+                Text(
+                    text = "Calories:",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(end = 12.dp)
+                )
+                Text(
+                    text = "$calories kcal",
+                    fontSize = 28.sp
                 )
             }
         }
