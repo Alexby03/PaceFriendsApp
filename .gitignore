@@ -1,0 +1,33 @@
+# Gradle
+.gradle/
+build/
+app/build/
+!gradle-wrapper.jar
+
+# Kotlin / Java
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.apk
+*.aar
+
+# Android Studio & IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+local.properties
+
+# Android specific (if applicable)
+.navigation/
+captures/
+.externalNativeBuild
+.cxx/
+*.jks
+*.keystore
+
+# System files
+.DS_Store
+Thumbs.db
