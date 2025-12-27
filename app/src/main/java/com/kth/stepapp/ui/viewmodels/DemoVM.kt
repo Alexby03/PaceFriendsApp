@@ -89,5 +89,5 @@ class FakeDemoVM: DemoViewModel {
 
     override val caloriesBurned = MutableStateFlow(180)
 
-    override val walkingTimeSeconds = MutableStateFlow(124L)
+    override val walkingTimeSeconds = MutableStateFlow(53L)
 }
