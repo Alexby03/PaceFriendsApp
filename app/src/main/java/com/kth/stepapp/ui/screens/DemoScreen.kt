@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -43,44 +48,56 @@ fun DemoScreen(
 
     val timeSeconds by vm.walkingTimeSeconds.collectAsState()
 
+    val isTracking by vm.isTracking.collectAsState(initial = false)
+
     val minutes = timeSeconds / 60
 
     val context = LocalContext.current
+
+    var hasPermissions by remember { mutableStateOf(false) }
+
+    val permissionsToRequest = remember {
+        mutableListOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ).apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                add(Manifest.permission.ACTIVITY_RECOGNITION)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }.toTypedArray()
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val locationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-        val activityGranted = permissions[Manifest.permission.ACTIVITY_RECOGNITION] == true
-
-        if (locationGranted && activityGranted) {
-            vm.startTimer()
-            vm.startTrackingLocation()
-            vm.startTrackingStepsAndCals()
+        if (locationGranted) {
+            hasPermissions = true
         } else {
             Log.d("DemoScreen", "User denied permissions.")
         }
     }
 
     LaunchedEffect(Unit) {
-        val hasLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val hasActivity = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ContextCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED
-        } else true
-
-        if (!hasLocation || !hasActivity) {
+        val hasLoc = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        if (hasLoc) {
+            hasPermissions = true
+        } else {
             permissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACTIVITY_RECOGNITION
+                    Manifest.permission.ACTIVITY_RECOGNITION,
+                    Manifest.permission.POST_NOTIFICATIONS
                 )
             )
-        } else {
-            vm.startTimer()
-            vm.startTrackingLocation()
-            vm.startTrackingStepsAndCals()
         }
     }
 
@@ -150,6 +167,38 @@ fun DemoScreen(
                 )
             }
 
+            if (!hasPermissions) {
+                Button(
+                    onClick = {
+                        permissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.ACTIVITY_RECOGNITION,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            )
+                        )
+                    }
+                ) {
+                    Text("Enable Permissions")
+                }
+            } else {
+                if (isTracking) {
+                    Button(
+                        onClick = { vm.stopTracking() },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("Stop Tracking")
+                    }
+                } else {
+                    Button(
+                        onClick = { vm.startTracking() }
+                    ) {
+                        Text("Start Tracking")
+                    }
+                }
+            }
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(top = 24.dp)
@@ -158,6 +207,7 @@ fun DemoScreen(
                     text = "${vm.locationUiState.value.pathPoints}",
                 )
             }
+
         }
     }
 }
