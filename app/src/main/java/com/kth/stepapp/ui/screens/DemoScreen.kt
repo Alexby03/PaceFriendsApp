@@ -6,6 +6,8 @@ import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +29,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,6 +59,8 @@ fun DemoScreen(
     val context = LocalContext.current
 
     var hasPermissions by remember { mutableStateOf(false) }
+
+    val locationState = vm.locationUiState.collectAsState()
 
     val permissionsToRequest = remember {
         mutableListOf(
@@ -101,6 +107,8 @@ fun DemoScreen(
         }
     }
 
+    val mapTile by vm.currentMapTile.collectAsState()
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -113,101 +121,113 @@ fun DemoScreen(
         }
     ) { padding ->
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Steps:",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(end = 12.dp)
-                )
+        Box(modifier = Modifier.fillMaxSize()) {
 
-                Text(
-                    text = steps.toString(),
-                    fontSize = 32.sp,
-                )
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 24.dp)
-            ) {
-                Text(
-                    text = "Calories:",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(end = 12.dp)
-                )
-                Text(
-                    text = "$calories kcal",
-                    fontSize = 28.sp
-                )
-
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 24.dp)
-            ) {
-                Text(
-                    text = "Time walking: ",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Text(
-                    text = "$minutes min $timeSeconds s",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+            mapTile?.let { bitmap ->
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = "Map Background",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
             }
 
-            if (!hasPermissions) {
-                Button(
-                    onClick = {
-                        permissionLauncher.launch(
-                            arrayOf(
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.ACTIVITY_RECOGNITION,
-                                Manifest.permission.POST_NOTIFICATIONS
-                            )
-                        )
-                    }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Enable Permissions")
+                    Text(
+                        text = "Steps:",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(end = 12.dp)
+                    )
+
+                    Text(
+                        text = steps.toString(),
+                        fontSize = 32.sp,
+                    )
                 }
-            } else {
-                if (isTracking) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 24.dp)
+                ) {
+                    Text(
+                        text = "Calories:",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(end = 12.dp)
+                    )
+                    Text(
+                        text = "$calories kcal",
+                        fontSize = 28.sp
+                    )
+
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 24.dp)
+                ) {
+                    Text(
+                        text = "Time walking: ",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Text(
+                        text = "$minutes min $timeSeconds s",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                if (!hasPermissions) {
                     Button(
-                        onClick = { vm.stopTracking() },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        onClick = {
+                            permissionLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                                    Manifest.permission.ACTIVITY_RECOGNITION,
+                                    Manifest.permission.POST_NOTIFICATIONS
+                                )
+                            )
+                        }
                     ) {
-                        Text("Stop Tracking")
+                        Text("Enable Permissions")
                     }
                 } else {
-                    Button(
-                        onClick = { vm.startTracking() }
-                    ) {
-                        Text("Start Tracking")
+                    if (isTracking) {
+                        Button(
+                            onClick = { vm.stopTracking() },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        ) {
+                            Text("Stop Tracking")
+                        }
+                    } else {
+                        Button(
+                            onClick = { vm.startTracking() }
+                        ) {
+                            Text("Start Tracking")
+                        }
                     }
                 }
-            }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 24.dp)
-            ) {
-                Text(
-                    text = "${vm.locationUiState.value.pathPoints}",
-                )
-            }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 24.dp)
+                ) {
+                    Text(
+                        text = "${locationState.value.pathPoints}",
+                    )
+                }
 
+            }
         }
     }
 }
