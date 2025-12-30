@@ -36,10 +36,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.kth.stepapp.ui.theme.StepAppTheme
 import com.kth.stepapp.ui.viewmodels.DemoViewModel
 import com.kth.stepapp.ui.viewmodels.FakeDemoVM
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -123,14 +127,24 @@ fun DemoScreen(
 
         Box(modifier = Modifier.fillMaxSize()) {
 
-            mapTile?.let { bitmap ->
-                Image(
-                    bitmap = bitmap.asImageBitmap(),
-                    contentDescription = "Map Background",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { ctx ->
+                    MapView(ctx).apply {
+                        setTileSource(TileSourceFactory.MAPNIK)
+                        setMultiTouchControls(true)
+                        controller.setZoom(18.0)
+                    }
+                },
+                update = { mapView ->
+                    val lat = locationState.value.currentLat
+                    val lng = locationState.value.currentLng
+
+                    if (lat != 0.0 && lng != 0.0) {
+                        mapView.controller.setCenter(GeoPoint(lat, lng))
+                    }
+                }
+            )
 
             Column(
                 modifier = Modifier

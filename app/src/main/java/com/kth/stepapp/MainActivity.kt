@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        org.osmdroid.config.Configuration.getInstance().userAgentValue = "PaceFriendsApp/1.0"
         enableEdgeToEdge()
         setContent {
             val demoViewModel: DemoVM = viewModel(factory = DemoVM.Factory)

@@ -12,7 +12,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kth.stepapp.PaceFriendsApplication
 import com.kth.stepapp.core.entities.LocationUiState
 import com.kth.stepapp.core.services.TrackingService
-import com.kth.stepapp.data.repositories.MapRepository
 import com.kth.stepapp.data.repositories.TrackingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -68,25 +67,25 @@ class DemoVM(
 //            historyRepository.insertRun(date = now(), steps = finalSteps, calories = finalCals)
 //        }
 //    }
-
-    init {
-        viewModelScope.launch {
-            locationUiState.collect { state ->
-                Log.d("DemoVM", "Location update: ${state.currentLat}, ${state.currentLng}")
-                val lat = state.currentLat
-                val lon = state.currentLng
-                if (lat == 0.0 && lon == 0.0) return@collect
-
-                val zoom = 16
-
-                val bitmap = MapRepository.getMapTile(lat, lon, zoom)
-                Log.d("DemoVM", "Bitmap result: $bitmap")
-                if (bitmap != null) {
-                    _currentMapTile.value = bitmap
-                }
-            }
-        }
-    }
+//
+//    init {
+//        viewModelScope.launch {
+//            locationUiState.collect { state ->
+//                Log.d("DemoVM", "Location update: ${state.currentLat}, ${state.currentLng}")
+//                val lat = state.currentLat
+//                val lon = state.currentLng
+//                if (lat == 0.0 && lon == 0.0) return@collect
+//
+//                val zoom = 16
+//
+//                val bitmap = MapRepository.getMapTile(lat, lon, zoom)
+//                Log.d("DemoVM", "Bitmap result: $bitmap")
+//                if (bitmap != null) {
+//                    _currentMapTile.value = bitmap
+//                }
+//            }
+//        }
+//    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
