@@ -13,11 +13,14 @@ object TrackingRepository {
     private val _caloriesBurned = MutableStateFlow(0)
     private val _locationUiState = MutableStateFlow(LocationUiState())
 
+    private val _areaInSqMeters: MutableStateFlow<Double> = MutableStateFlow(0.0)
+
     val nrOfSteps = _nrOfSteps.asStateFlow()
     val walkingTimeSeconds = _walkingTimeSeconds.asStateFlow()
     val isTracking = _isTracking.asStateFlow()
     val caloriesBurned = _caloriesBurned.asStateFlow()
     val locationUiState = _locationUiState.asStateFlow()
+    val areaInSqMeters = _areaInSqMeters.asStateFlow()
 
     fun setTrackingState(isTracking: Boolean) {
         _isTracking.value = isTracking

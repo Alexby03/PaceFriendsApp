@@ -23,8 +23,9 @@ interface DemoViewModel {
     val caloriesBurned: StateFlow<Int>
     val walkingTimeSeconds: StateFlow<Long>
     val locationUiState: StateFlow<LocationUiState>
-    val currentMapTile: StateFlow<Bitmap?>
+    //val currentMapTile: StateFlow<Bitmap?>
     val isTracking: StateFlow<Boolean>
+    val areaInSqMeters: StateFlow<Double>
     fun startTracking()
     fun stopTracking()
 }
@@ -38,9 +39,10 @@ class DemoVM(
     override val walkingTimeSeconds = TrackingRepository.walkingTimeSeconds
     override val locationUiState = TrackingRepository.locationUiState
     override val isTracking = TrackingRepository.isTracking
+    override val areaInSqMeters = TrackingRepository.areaInSqMeters
 
-    private val _currentMapTile: MutableStateFlow<Bitmap?> = MutableStateFlow(null)
-    override val currentMapTile = _currentMapTile.asStateFlow()
+    //private val _currentMapTile: MutableStateFlow<Bitmap?> = MutableStateFlow(null)
+    //override val currentMapTile = _currentMapTile.asStateFlow()
 
     override fun startTracking() {
         Intent(app, TrackingService::class.java).also {
@@ -109,7 +111,9 @@ class FakeDemoVM: DemoViewModel {
 
     override val isTracking = MutableStateFlow(false)
 
-    override val currentMapTile = MutableStateFlow(null)
+    //override val currentMapTile = MutableStateFlow(null)
+
+    override val areaInSqMeters = MutableStateFlow(0.0)
 
     override fun startTracking() { }
 

@@ -14,6 +14,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.kth.stepapp.R
+import com.kth.stepapp.core.utils.GeometryUtils
 
 class TrackingService : Service() {
     private lateinit var locationService: LocationService
@@ -73,6 +74,7 @@ class TrackingService : Service() {
         serviceScope.launch {
             locationService.getLocationUpdates(1000).collect { location ->
                 TrackingRepository.addLocationPoint(location.latitude, location.longitude)
+                GeometryUtils.calculateArea(TrackingRepository.locationUiState.value.pathPoints)
             }
         }
     }
