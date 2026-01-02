@@ -8,16 +8,15 @@ import com.kth.stepapp.ui.theme.StepAppTheme
 import com.kth.stepapp.ui.screens.DemoScreen
 import com.kth.stepapp.ui.viewmodels.DemoVM
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kth.stepapp.ui.navigation.AppNavGraph
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        org.osmdroid.config.Configuration.getInstance().userAgentValue = "PaceFriendsApp/1.0"
-        enableEdgeToEdge()
+
         setContent {
-            val demoViewModel: DemoVM = viewModel(factory = DemoVM.Factory)
             StepAppTheme {
-                DemoScreen(demoViewModel)
+                AppNavGraph()
             }
         }
     }

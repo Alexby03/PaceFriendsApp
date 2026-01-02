@@ -1,41 +1,22 @@
 package com.kth.stepapp.ui.screens
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
@@ -50,62 +31,43 @@ import com.kth.stepapp.ui.viewmodels.FakeDemoVM
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Polyline
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DemoScreen(
-    vm: DemoViewModel
+    vm: DemoViewModel,
+    onBack: () -> Unit
 ) {
     val steps by vm.nrOfSteps.collectAsState()
-
     val calories by vm.caloriesBurned.collectAsState()
-
     val timeSeconds by vm.walkingTimeSeconds.collectAsState()
-
     val isTracking by vm.isTracking.collectAsState(initial = false)
+    val locationState by vm.locationUiState.collectAsState()
+    val currentArea by vm.areaInSqMeters.collectAsState()
 
     val minutes = timeSeconds / 60
-
     val context = LocalContext.current
+    val isPreview = LocalInspectionMode.current
 
     var hasPermissions by remember { mutableStateOf(false) }
 
-    val locationState = vm.locationUiState.collectAsState()
-    
-    val currentArea = vm.areaInSqMeters.collectAsState()
-
-    val permissionsToRequest = remember {
-        mutableListOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ).apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                add(Manifest.permission.ACTIVITY_RECOGNITION)
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                add(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }.toTypedArray()
-    }
-
     val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
+        ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val locationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-        if (locationGranted) {
-            hasPermissions = true
-        } else {
-            Log.d("DemoScreen", "User denied permissions.")
-        }
+        hasPermissions = granted
+        if (!granted) Log.d("DemoScreen", "Permissions denied")
     }
 
     LaunchedEffect(Unit) {
-        val hasLoc = ContextCompat.checkSelfPermission(
+        val granted = ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-        if (hasLoc) {
+
+        if (granted) {
             hasPermissions = true
         } else {
             permissionLauncher.launch(
@@ -123,17 +85,19 @@ fun DemoScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Test Screen") },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
             )
         }
     ) { padding ->
 
         Column(modifier = Modifier.fillMaxSize()) {
-
-            val isPreview = LocalInspectionMode.current
 
             Column(
                 modifier = Modifier
@@ -141,98 +105,66 @@ fun DemoScreen(
                     .padding(padding),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Steps:",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(end = 12.dp)
-                    )
 
-                    Text(
-                        text = steps.toString(),
-                        fontSize = 32.sp,
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 24.dp)
-                ) {
-                    Text(
-                        text = "Calories:",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(end = 12.dp)
-                    )
-                    Text(
-                        text = "$calories kcal",
-                        fontSize = 28.sp
-                    )
-
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Steps:", fontSize = 32.sp, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.width(12.dp))
+                    Text(steps.toString(), fontSize = 32.sp)
                 }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 24.dp)
-                ) {
-                    Text(
-                        text = "Time walking: ",
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                Spacer(Modifier.height(24.dp))
 
-                    Text(
-                        text = "$minutes min ${timeSeconds%60} s",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Calories:", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.width(12.dp))
+                    Text("$calories kcal", fontSize = 28.sp)
                 }
+
+                Spacer(Modifier.height(24.dp))
+
+                Text(
+                    text = "Time walking: $minutes min ${timeSeconds % 60} s",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(Modifier.height(24.dp))
 
                 if (!hasPermissions) {
-                    Button(
-                        onClick = {
-                            permissionLauncher.launch(
-                                arrayOf(
-                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                                    Manifest.permission.ACTIVITY_RECOGNITION,
-                                    Manifest.permission.POST_NOTIFICATIONS
-                                )
+                    Button(onClick = {
+                        permissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.ACTIVITY_RECOGNITION,
+                                Manifest.permission.POST_NOTIFICATIONS
                             )
-                        }
-                    ) {
+                        )
+                    }) {
                         Text("Enable Permissions")
                     }
                 } else {
-                    if (isTracking) {
-                        Button(
-                            onClick = { vm.stopTracking() },
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                        ) {
-                            Text("Stop Tracking")
-                        }
-                    } else {
-                        Button(
-                            onClick = { vm.startTracking() }
-                        ) {
-                            Text("Start Tracking")
-                        }
+                    Button(
+                        onClick = {
+                            if (isTracking) vm.stopTracking() else vm.startTracking()
+                        },
+                        colors = if (isTracking)
+                            ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        else ButtonDefaults.buttonColors()
+                    ) {
+                        Text(if (isTracking) "Stop Tracking" else "Start Tracking")
                     }
                 }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 24.dp)
-                ) {
-                    Text(
-                        text = "${currentArea.value} m²",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                Spacer(Modifier.height(24.dp))
 
+                Text(
+                    text = "$currentArea m²",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -240,7 +172,6 @@ fun DemoScreen(
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             ) {
                 if (isPreview) {
-                    // FAKE PREVIEW FOR MAP OVERWRITE
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -259,32 +190,34 @@ fun DemoScreen(
                                 controller.setZoom(18.0)
                             }
                         },
-                        update = { mapView ->
-                            val lat = locationState.value.currentLat
-                            val lng = locationState.value.currentLng
-                            if (lat != 0.0 && lng != 0.0) {
-                                val currentPoint = GeoPoint(lat, lng)
-                                mapView.controller.setCenter(currentPoint)
+                        update = { map ->
+                            if (locationState.currentLat != 0.0) {
+                                map.controller.setCenter(
+                                    GeoPoint(
+                                        locationState.currentLat,
+                                        locationState.currentLng
+                                    )
+                                )
                             }
 
-                            mapView.overlays.clear()
+                            map.overlays.clear()
 
-                            val line = org.osmdroid.views.overlay.Polyline()
-                            line.outlinePaint.color = android.graphics.Color.RED
-                            line.outlinePaint.strokeWidth = 10f
-
-                            val geoPoints = locationState.value.pathPoints.map { pair ->
-                                GeoPoint(pair.first, pair.second)
+                            val polyline = Polyline().apply {
+                                outlinePaint.color = android.graphics.Color.RED
+                                outlinePaint.strokeWidth = 10f
+                                setPoints(
+                                    locationState.pathPoints.map {
+                                        GeoPoint(it.first, it.second)
+                                    }
+                                )
                             }
 
-                            line.setPoints(geoPoints)
-                            mapView.overlays.add(line)
-                            mapView.invalidate()
+                            map.overlays.add(polyline)
+                            map.invalidate()
                         }
                     )
                 }
             }
-
         }
     }
 }
@@ -293,6 +226,9 @@ fun DemoScreen(
 @Composable
 fun DemoScreenPreview() {
     StepAppTheme {
-        DemoScreen(vm = FakeDemoVM())
+        DemoScreen(
+            vm = FakeDemoVM(),
+            onBack = {}
+        )
     }
 }
