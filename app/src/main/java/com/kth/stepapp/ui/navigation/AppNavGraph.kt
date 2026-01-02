@@ -1,13 +1,12 @@
 package com.kth.stepapp.ui.navigation
 
-import androidx.compose.material.Button
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.kth.stepapp.ui.screens.DemoScreen
+import com.kth.stepapp.ui.screens.HomeScreen
 import com.kth.stepapp.ui.viewmodels.DemoVM
 
 @Composable
@@ -35,13 +34,3 @@ fun AppNavGraph() {
         }
     }
 }
-
-@Composable
-fun HomeScreen(
-    onGoToDemo: () -> Unit
-) {
-    Button(onClick = onGoToDemo) {
-        Text("Go to Demo")
-    }
-}
-

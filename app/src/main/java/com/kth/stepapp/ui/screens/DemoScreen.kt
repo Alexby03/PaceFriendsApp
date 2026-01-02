@@ -45,7 +45,7 @@ fun DemoScreen(
     val timeSeconds by vm.walkingTimeSeconds.collectAsState()
     val isTracking by vm.isTracking.collectAsState(initial = false)
     val locationState by vm.locationUiState.collectAsState()
-    val currentArea = vm.areaInSqMeters.collectAsState()
+    val currentArea by vm.areaInSqMeters.collectAsState()
     val minutes = timeSeconds / 60
     val context = LocalContext.current
     val isPreview = LocalInspectionMode.current
@@ -163,7 +163,7 @@ fun DemoScreen(
                     modifier = Modifier.padding(top = 24.dp)
                 ) {
                     Text(
-                        text = "%.1f m²".format(currentArea.value),
+                        text = "%.1f m²".format(currentArea),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )

@@ -1,33 +1,32 @@
 package com.kth.stepapp.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kth.stepapp.ui.theme.StepAppTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onGoToDemo: () -> Unit
 ) {
-    Surface(
-        modifier = Modifier.fillMaxSize()
-    ) {
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { androidx.compose.material3.Text("Test Screen") }
+            )
+        }
+    ) { padding ->
+
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
+                .fillMaxWidth()
+                .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
