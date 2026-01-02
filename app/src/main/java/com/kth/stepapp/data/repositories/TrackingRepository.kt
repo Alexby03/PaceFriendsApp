@@ -31,6 +31,10 @@ object TrackingRepository {
         _caloriesBurned.value = calories
     }
 
+    fun updateArea(area: Double) {
+        _areaInSqMeters.value = area
+    }
+
     fun tickTimer() {
         _walkingTimeSeconds.update { it + 1 }
     }
@@ -50,5 +54,6 @@ object TrackingRepository {
         _walkingTimeSeconds.value = 0L
         _caloriesBurned.value = 0
         _locationUiState.value = LocationUiState()
+        _areaInSqMeters.value = 0.0
     }
 }

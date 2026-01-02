@@ -226,7 +226,7 @@ fun DemoScreen(
                     modifier = Modifier.padding(top = 24.dp)
                 ) {
                     Text(
-                        text = "${currentArea.value} m²",
+                        text = "%.1f m²".format(currentArea.value),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
