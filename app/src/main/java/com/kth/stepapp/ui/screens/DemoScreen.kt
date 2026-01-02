@@ -158,12 +158,16 @@ fun DemoScreen(
 
                 Spacer(Modifier.height(24.dp))
 
-                Text(
-                    text = "$currentArea m²",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 24.dp)
+                ) {
+                    Text(
+                        text = "%.1f m²".format(currentArea.value),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
 
             Box(
                 modifier = Modifier

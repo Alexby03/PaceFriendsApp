@@ -41,7 +41,7 @@ class TrackingService : Service() {
 
     private fun start() {
         val notification = NotificationCompat.Builder(this, "TRACKING_CHANNEL")
-            .setContentTitle("Tracking your current session...")
+            .setContentTitle("Tracking current session...")
             .setSmallIcon(R.mipmap.ic_launcher)
             .build()
         startForeground(1, notification)
@@ -74,7 +74,7 @@ class TrackingService : Service() {
         serviceScope.launch {
             locationService.getLocationUpdates(1000).collect { location ->
                 TrackingRepository.addLocationPoint(location.latitude, location.longitude)
-                GeometryUtils.calculateArea(TrackingRepository.locationUiState.value.pathPoints)
+                TrackingRepository.updateArea(GeometryUtils.calculateArea(TrackingRepository.locationUiState.value.pathPoints))
             }
         }
     }
