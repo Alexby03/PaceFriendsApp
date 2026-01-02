@@ -32,6 +32,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
+import kotlin.text.format
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,8 +45,7 @@ fun DemoScreen(
     val timeSeconds by vm.walkingTimeSeconds.collectAsState()
     val isTracking by vm.isTracking.collectAsState(initial = false)
     val locationState by vm.locationUiState.collectAsState()
-    val currentArea by vm.areaInSqMeters.collectAsState()
-
+    val currentArea = vm.areaInSqMeters.collectAsState()
     val minutes = timeSeconds / 60
     val context = LocalContext.current
     val isPreview = LocalInspectionMode.current
@@ -168,6 +168,7 @@ fun DemoScreen(
                         fontWeight = FontWeight.Bold
                     )
                 }
+            }
 
             Box(
                 modifier = Modifier
