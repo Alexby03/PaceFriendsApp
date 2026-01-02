@@ -12,13 +12,14 @@ import com.kth.stepapp.ui.theme.StepAppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onGoToDemo: () -> Unit
+    onGoToDemo: () -> Unit,
+    onGoToLogin: () -> Unit
 ) {
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { androidx.compose.material3.Text("Test Screen") }
+                title = { Text("Home") }
             )
         }
     ) { padding ->
@@ -29,11 +30,16 @@ fun HomeScreen(
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Home Screen",
-            )
+
+            Text(text = "Home Screen")
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            Button(onClick = onGoToLogin) {
+                Text("Login / Create Profile")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(onClick = onGoToDemo) {
                 Text("Go to Demo")
@@ -47,7 +53,9 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     StepAppTheme {
         HomeScreen(
-            onGoToDemo = {}   // dummy navigation for preview
+            onGoToDemo = {},
+            onGoToLogin = {}
         )
     }
 }
+

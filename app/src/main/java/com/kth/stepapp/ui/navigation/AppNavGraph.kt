@@ -7,7 +7,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.kth.stepapp.ui.screens.DemoScreen
 import com.kth.stepapp.ui.screens.HomeScreen
+import com.kth.stepapp.ui.screens.LoginScreen
 import com.kth.stepapp.ui.viewmodels.DemoVM
+import com.kth.stepapp.ui.viewmodels.LoginVM
 
 @Composable
 fun AppNavGraph() {
@@ -15,22 +17,47 @@ fun AppNavGraph() {
 
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = Routes.HOME
     ) {
-        composable("home") {
+
+        // 🏠 HOME
+        composable(Routes.HOME) {
             HomeScreen(
                 onGoToDemo = {
-                    navController.navigate("demo")
+                    navController.navigate(Routes.DEMO)
+                },
+                onGoToLogin = {
+                    navController.navigate(Routes.LOGIN)
                 }
             )
         }
 
-        composable("demo") {
+
+        composable(Routes.LOGIN) {
+            val loginVM: LoginVM = viewModel(factory = LoginVM.Factory)
+
+            LoginScreen(
+                vm = loginVM,
+                onSuccess = {
+                    navController.popBackStack(Routes.HOME, false)
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+
+        }
+
+        composable(Routes.DEMO) {
             val demoViewModel: DemoVM = viewModel(factory = DemoVM.Factory)
+
             DemoScreen(
                 vm = demoViewModel,
-                onBack = { navController.popBackStack() }
+                onBack = {
+                    navController.popBackStack()
+                }
             )
         }
     }
 }
+
