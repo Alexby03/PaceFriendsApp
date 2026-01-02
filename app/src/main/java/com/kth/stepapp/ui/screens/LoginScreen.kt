@@ -65,7 +65,7 @@ fun LoginScreen(
                 label = { Text("Full name") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true ,
-                textStyle = LocalTextStyle.current.copy(color = Color.Black),
+                textStyle = LocalTextStyle.current.copy(color = Color.Black)
             )
 
             OutlinedTextField(
@@ -74,7 +74,8 @@ fun LoginScreen(
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                textStyle = LocalTextStyle.current.copy(color = Color.Black)
             )
 
             OutlinedTextField(
@@ -87,7 +88,8 @@ fun LoginScreen(
                 label = { Text("Age") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                textStyle = LocalTextStyle.current.copy(color = Color.Black)
             )
 
             OutlinedTextField(
@@ -118,15 +120,16 @@ fun LoginScreen(
                 label = { Text("Weight (kg)") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
-            )
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),)
 
             OutlinedTextField(
                 value = gender,
                 onValueChange = vm::onGenderChange,
                 label = { Text("Gender") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),
             )
 
             error?.let {
