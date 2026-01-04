@@ -94,6 +94,7 @@ fun CalendarScreenPreview() {
     )
 }
 
+// TODO Put thia function in a different packaged later
 @Composable
 private fun DaysOfWeekHeader() {
     Row(modifier = Modifier.fillMaxWidth()) {
@@ -108,6 +109,7 @@ private fun DaysOfWeekHeader() {
     }
 }
 
+// TODO Put thia function in a different packaged later
 @Composable
 private fun CalendarGrid(
     yearMonth: YearMonth,
@@ -146,6 +148,7 @@ private fun CalendarGrid(
     }
 }
 
+// TODO Put thia function in a different packaged later
 @Composable
 private fun DayCell(
     date: LocalDate,
