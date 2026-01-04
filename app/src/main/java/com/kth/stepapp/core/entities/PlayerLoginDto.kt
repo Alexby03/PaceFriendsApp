@@ -3,9 +3,9 @@ package com.kth.stepapp.core.entities
 import com.google.gson.annotations.SerializedName
 
 data class PlayerLoginDto(
-    @SerializedName("Email")
+    @SerializedName("email")
     val email: String,
 
-    @SerializedName("Password")
+    @SerializedName("password")
     val password: String
 )

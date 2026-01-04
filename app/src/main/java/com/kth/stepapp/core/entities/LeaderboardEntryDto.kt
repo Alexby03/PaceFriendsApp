@@ -3,12 +3,12 @@ package com.kth.stepapp.core.entities
 import com.google.gson.annotations.SerializedName
 
 data class LeaderboardEntryDto(
-    @SerializedName("PlayerId")
+    @SerializedName("playerId")
     val playerId: String,
 
-    @SerializedName("FullName")
+    @SerializedName("fullName")
     val fullName: String,
 
-    @SerializedName("Score")
+    @SerializedName("score")
     val score: Long
 )

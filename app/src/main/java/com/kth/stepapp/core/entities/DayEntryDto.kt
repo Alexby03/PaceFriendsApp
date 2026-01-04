@@ -3,27 +3,27 @@ package com.kth.stepapp.core.entities
 import com.google.gson.annotations.SerializedName
 
 data class DayEntryDto(
-    @SerializedName("Date")
+    @SerializedName("date")
     val date: String,
 
-    @SerializedName("TotalSteps")
+    @SerializedName("totalSteps")
     val totalSteps: Long,
 
-    @SerializedName("TotalCalories")
+    @SerializedName("totalCalories")
     val totalCalories: Long,
 
-    @SerializedName("TimeSpentSeconds")
+    @SerializedName("timeSpentSeconds")
     val timeSpentSeconds: Long,
 
-    @SerializedName("AreaInSquareMeters")
+    @SerializedName("areaInSquareMeters")
     val areaInSquareMeters: Double,
 
-    @SerializedName("Score")
+    @SerializedName("score")
     val score: Long,
 
-    @SerializedName("Activity")
+    @SerializedName("activity")
     val activity: String,
 
-    @SerializedName("RoutePoints")
+    @SerializedName("routePoints")
     val routePoints: List<RoutePointDto>
 )

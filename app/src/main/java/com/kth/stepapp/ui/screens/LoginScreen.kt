@@ -26,12 +26,13 @@ fun LoginScreen(
 
     val fullName by vm.fullName.collectAsStateWithLifecycle()
     val email by vm.email.collectAsStateWithLifecycle()
+    val password by vm.password.collectAsStateWithLifecycle()
     val age by vm.age.collectAsStateWithLifecycle()
     val heightCm by vm.heightCm.collectAsStateWithLifecycle()
     val weightKg by vm.weightKg.collectAsStateWithLifecycle()
     val gender by vm.gender.collectAsStateWithLifecycle()
-    val isSaved by vm.isSaved.collectAsState()
-    val error by vm.error.collectAsState()
+    val isSaved by vm.isSaved.collectAsStateWithLifecycle()
+    val error by vm.error.collectAsStateWithLifecycle()
 
     LaunchedEffect(isSaved) {
         if (isSaved) onSuccess()
@@ -65,7 +66,7 @@ fun LoginScreen(
                 label = { Text("Full name") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true ,
-                textStyle = LocalTextStyle.current.copy(color = Color.Black)
+                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary)
             )
 
             OutlinedTextField(
@@ -75,7 +76,17 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                textStyle = LocalTextStyle.current.copy(color = Color.Black)
+                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary)
+            )
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = vm::onPasswordChange,
+                label = { Text("Password") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary)
             )
 
             OutlinedTextField(
@@ -89,7 +100,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                textStyle = LocalTextStyle.current.copy(color = Color.Black)
+                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary)
             )
 
             OutlinedTextField(
@@ -105,7 +116,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                textStyle = LocalTextStyle.current.copy(color = Color.Black)
+                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary)
             )
 
             OutlinedTextField(
@@ -121,7 +132,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                textStyle = LocalTextStyle.current.copy(color = Color.Black),)
+                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary),)
 
             OutlinedTextField(
                 value = gender,
@@ -129,7 +140,7 @@ fun LoginScreen(
                 label = { Text("Gender") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                textStyle = LocalTextStyle.current.copy(color = Color.Black),
+                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary),
             )
 
             error?.let {

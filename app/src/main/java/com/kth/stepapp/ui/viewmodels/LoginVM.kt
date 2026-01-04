@@ -1,19 +1,25 @@
 package com.kth.stepapp.ui.viewmodels
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kth.stepapp.PaceFriendsApplication
+import com.kth.stepapp.core.entities.PlayerDto
 import com.kth.stepapp.data.models.UserProfile
+import com.kth.stepapp.data.repositories.PaceFriendsRepository
 import com.kth.stepapp.data.repository.ProfileRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 interface LoginViewModel {
     val fullName: StateFlow<String>
     val email: StateFlow<String>
+    val password: StateFlow<String>
     val age: StateFlow<String>
     val heightCm: StateFlow<String>
     val weightKg: StateFlow<String>
@@ -23,6 +29,7 @@ interface LoginViewModel {
 
     fun onFullNameChange(value: String)
     fun onEmailChange(value: String)
+    fun onPasswordChange(value: String)
     fun onAgeChange(value: String)
     fun onHeightChange(value: String)
     fun onWeightChange(value: String)
@@ -32,16 +39,20 @@ interface LoginViewModel {
 }
 
 class LoginVM(
-    private val app: Application
+    private val app: Application,
+    private val paceFriendsRepository: PaceFriendsRepository
 ) : LoginViewModel, ViewModel() {
 
-    private val repository = ProfileRepository()
+    //private val repository = ProfileRepository()
 
     private val _fullName = MutableStateFlow("")
     override val fullName: StateFlow<String> = _fullName
 
     private val _email = MutableStateFlow("")
     override val email: StateFlow<String> = _email
+
+    private val _password = MutableStateFlow("")
+    override val password: StateFlow<String> = _password
 
     private val _age = MutableStateFlow("")
     override val age: StateFlow<String> = _age
@@ -69,6 +80,10 @@ class LoginVM(
         _email.value = value
     }
 
+    override fun onPasswordChange(value: String) {
+        _password.value = value
+    }
+
     override fun onAgeChange(value: String) {
         _age.value = value
     }
@@ -86,22 +101,41 @@ class LoginVM(
     }
 
     override fun onSubmit() {
-        try {
-            val profile = UserProfile(
-                fullName = _fullName.value,
-                email = _email.value,
-                age = _age.value.toInt(),
-                heightCm = _heightCm.value.toDouble(),
-                weightKg = _weightKg.value.toDouble(),
-                gender = _gender.value
+
+        val player = try {
+            PlayerDto(
+                null,
+                _fullName.value,
+                _email.value,
+                _password.value,
+                _age.value.toInt(),
+                _heightCm.value.toDouble(),
+                _weightKg.value.toDouble(),
+                _gender.value,
+                0,
+                0,
+                0
             )
-
-            repository.saveProfile(profile)
-            _isSaved.value = true
-            _error.value = null
-
         } catch (e: Exception) {
             _error.value = "Invalid input values"
+            return
+        }
+
+
+        viewModelScope.launch {
+            try {
+                val result = paceFriendsRepository.registerUser(player)
+
+                if (result != null) {
+                    Log.d("OkHttp", result.toString())
+                    _isSaved.value = true
+                    _error.value = null
+                } else {
+                    _error.value = "Registration failed (Server Error)"
+                }
+            } catch (e: Exception) {
+                _error.value = "Network error: ${e.message}"
+            }
         }
     }
 
@@ -111,7 +145,8 @@ class LoginVM(
             initializer {
                 val app = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
                         as PaceFriendsApplication)
-                LoginVM(app = app)
+                val repository = PaceFriendsRepository()
+                LoginVM(app = app, repository)
             }
         }
     }
@@ -120,6 +155,7 @@ class LoginVM(
 class FakeLoginVM : LoginViewModel {
     override val fullName = MutableStateFlow("Test User")
     override val email = MutableStateFlow("test@test.com")
+    override val password = MutableStateFlow("test")
     override val age = MutableStateFlow("25")
     override val heightCm = MutableStateFlow("180")
     override val weightKg = MutableStateFlow("75")
@@ -129,6 +165,7 @@ class FakeLoginVM : LoginViewModel {
 
     override fun onFullNameChange(value: String) {}
     override fun onEmailChange(value: String) {}
+    override fun onPasswordChange(value: String) {}
     override fun onAgeChange(value: String) {}
     override fun onHeightChange(value: String) {}
     override fun onWeightChange(value: String) {}

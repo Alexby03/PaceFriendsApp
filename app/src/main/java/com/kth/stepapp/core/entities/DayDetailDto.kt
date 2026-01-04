@@ -3,21 +3,21 @@ package com.kth.stepapp.core.entities
 import com.google.gson.annotations.SerializedName
 
 data class DayDetailDto(
-    @SerializedName("DayId")
+    @SerializedName("dayId")
     val dayId: String,
 
-    @SerializedName("Date")
+    @SerializedName("date")
     val date: String,
 
-    @SerializedName("Steps")
+    @SerializedName("steps")
     val steps: Long,
 
-    @SerializedName("Calories")
+    @SerializedName("calories")
     val calories: Long,
 
-    @SerializedName("Score")
+    @SerializedName("score")
     val score: Long,
 
-    @SerializedName("RoutePoints")
+    @SerializedName("routePoints")
     val routePoints: List<RoutePointDto>
 )

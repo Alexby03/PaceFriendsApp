@@ -3,18 +3,18 @@ package com.kth.stepapp.core.entities
 import com.google.gson.annotations.SerializedName
 
 data class DaySummaryDto(
-    @SerializedName("DayId")
+    @SerializedName("dayId")
     val dayId: String,
 
-    @SerializedName("Date")
+    @SerializedName("date")
     val date: String,
 
-    @SerializedName("Steps")
+    @SerializedName("steps")
     val steps: Long,
 
-    @SerializedName("Score")
+    @SerializedName("score")
     val score: Long,
 
-    @SerializedName("Completed")
+    @SerializedName("completed")
     val completed: Boolean
 )

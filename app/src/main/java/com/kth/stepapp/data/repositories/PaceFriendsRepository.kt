@@ -4,7 +4,7 @@ import android.util.Log
 import com.kth.stepapp.core.entities.*
 import com.kth.stepapp.core.api.RetrofitClient
 
-class PaceRepository {
+class PaceFriendsRepository {
 
     private val api = RetrofitClient.apiService
 

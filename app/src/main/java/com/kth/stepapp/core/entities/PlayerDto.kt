@@ -3,36 +3,36 @@ package com.kth.stepapp.core.entities
 import com.google.gson.annotations.SerializedName
 
 data class PlayerDto(
-    @SerializedName("PlayerId")
+    @SerializedName("playerId")
     val playerId: String?,
 
-    @SerializedName("FullName")
+    @SerializedName("fullName")
     val fullName: String,
 
-    @SerializedName("Email")
+    @SerializedName("email")
     val email: String,
 
-    @SerializedName("Password")
+    @SerializedName("password")
     val password: String?,
 
-    @SerializedName("Age")
+    @SerializedName("age")
     val age: Int,
 
-    @SerializedName("HeightCm")
+    @SerializedName("heightCm")
     val heightCm: Double,
 
-    @SerializedName("WeightKg")
+    @SerializedName("weightKg")
     val weightKg: Double,
 
-    @SerializedName("Gender")
+    @SerializedName("gender")
     val gender: String,
 
-    @SerializedName("TotalScore")
+    @SerializedName("totalScore")
     val totalScore: Long,
 
-    @SerializedName("CurrentStreak")
+    @SerializedName("currentStreak")
     val currentStreak: Int,
 
-    @SerializedName("WeekScore")
+    @SerializedName("weekScore")
     val weekScore: Long
 )
