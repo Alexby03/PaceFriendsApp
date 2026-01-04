@@ -10,6 +10,9 @@ import com.kth.stepapp.ui.screens.HomeScreen
 import com.kth.stepapp.ui.screens.LoginScreen
 import com.kth.stepapp.ui.viewmodels.DemoVM
 import com.kth.stepapp.ui.viewmodels.LoginVM
+import com.kth.stepapp.ui.screens.CalendarScreen
+import com.kth.stepapp.ui.viewmodels.CalendarVM
+
 
 @Composable
 fun AppNavGraph() {
@@ -28,6 +31,9 @@ fun AppNavGraph() {
                 },
                 onGoToLogin = {
                     navController.navigate(Routes.LOGIN)
+                },
+                onGoToCalendar = {
+                    navController.navigate(Routes.CALENDAR)
                 }
             )
         }
@@ -53,6 +59,17 @@ fun AppNavGraph() {
 
             DemoScreen(
                 vm = demoViewModel,
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Routes.CALENDAR) {
+            val calendarVM: CalendarVM = viewModel(factory = CalendarVM.Factory)
+
+            CalendarScreen(
+                vm = calendarVM,
                 onBack = {
                     navController.popBackStack()
                 }

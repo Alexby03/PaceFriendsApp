@@ -13,7 +13,8 @@ import com.kth.stepapp.ui.theme.StepAppTheme
 @Composable
 fun HomeScreen(
     onGoToDemo: () -> Unit,
-    onGoToLogin: () -> Unit
+    onGoToLogin: () -> Unit,
+    onGoToCalendar: () -> Unit
 ) {
 
     Scaffold(
@@ -44,6 +45,12 @@ fun HomeScreen(
             Button(onClick = onGoToDemo) {
                 Text("Go to Demo")
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(onClick = onGoToCalendar) {
+                Text("Open Calendar")
+            }
         }
     }
 }
@@ -54,7 +61,8 @@ fun HomeScreenPreview() {
     StepAppTheme {
         HomeScreen(
             onGoToDemo = {},
-            onGoToLogin = {}
+            onGoToLogin = {},
+            onGoToCalendar = {}
         )
     }
 }
