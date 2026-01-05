@@ -334,7 +334,3 @@ fun rememberMapViewWithLifecycle(): MapView {
 
     return mapView
 }
-
-
-
-

@@ -10,6 +10,7 @@ import com.google.android.gms.location.LocationServices
 import com.kth.stepapp.core.services.LocationService
 import com.kth.stepapp.core.services.StepCounter
 import com.kth.stepapp.data.repositories.UserPreferencesRepository
+import org.osmdroid.config.Configuration
 
 private const val APP_PREFERENCES_NAME = "user_preferences"
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
@@ -25,6 +26,7 @@ class PaceFriendsApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        Configuration.getInstance().userAgentValue = "AndroidApp"
         stepCounter = StepCounter(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationService = LocationService(this, fusedLocationClient)
