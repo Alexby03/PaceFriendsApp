@@ -34,9 +34,10 @@ interface ApiService {
         @Query("month") month: Int
     ): Response<List<DaySummaryDto>>
 
-    @GET("api/days/{dayId}")
+    @GET("api/day")
     suspend fun getDayDetail(
-        @Path("dayId") dayId: String
+        @Query("date") date: String, //"yyyy-MM-dd"
+        @Query("playerId") playerId: String
     ): Response<DayDetailDto>
 
     @GET("api/leaderboard")

@@ -92,9 +92,9 @@ class PaceFriendsRepository {
     // =================================================================
     // Get Day Detail
     // =================================================================
-    suspend fun getDayDetail(dayId: String): DayDetailDto? {
+    suspend fun getDayDetail(date: String, playerId: String): DayDetailDto? {
         return try {
-            val response = api.getDayDetail(dayId)
+            val response = api.getDayDetail(date, playerId)
             if (response.isSuccessful) response.body() else null
         } catch (e: Exception) {
             Log.e("Repo", "Day Detail error", e)
