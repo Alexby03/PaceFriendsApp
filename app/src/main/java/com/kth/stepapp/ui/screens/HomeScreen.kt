@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kth.stepapp.data.repositories.PlayerRepository
 import com.kth.stepapp.ui.theme.StepAppTheme
 import com.kth.stepapp.ui.viewmodels.FakeHomeVM
 import com.kth.stepapp.ui.viewmodels.HomeVM
@@ -17,7 +18,7 @@ import com.kth.stepapp.ui.viewmodels.HomeViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    vm: HomeViewModel = viewModel(factory = HomeVM.Factory),
+    vm: HomeViewModel,
     onGoToActivity: (String) -> Unit,
     onGoToCalendar: () -> Unit,
     onGoToProfile: () -> Unit,
@@ -54,13 +55,11 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            // Welcome
             Text(
                 text = "Welcome back, $fullName",
                 style = MaterialTheme.typography.headlineSmall
             )
 
-            // Weekly stats
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("This week so far", style = MaterialTheme.typography.titleMedium)
@@ -72,7 +71,6 @@ fun HomeScreen(
                 }
             }
 
-            // Daily status
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -113,7 +111,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Bottom buttons (Calendar + Logout)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -122,14 +119,16 @@ fun HomeScreen(
                     Text("Calendar")
                 }
 
-                OutlinedButton(onClick = onLogout) {
+                OutlinedButton(onClick = {
+                    vm.logoutPlayer()
+                    onLogout()
+                }) {
                     Text("Logout")
                 }
             }
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
@@ -144,5 +143,3 @@ fun HomeScreenPreview() {
         )
     }
 }
-
-

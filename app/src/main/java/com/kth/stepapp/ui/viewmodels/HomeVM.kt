@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kth.stepapp.PaceFriendsApplication
 import com.kth.stepapp.data.repositories.PlayerRepository
+import com.kth.stepapp.data.repositories.UserPreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -18,10 +19,11 @@ interface HomeViewModel {
     val weeklyScore: StateFlow<Long>
     val streak: StateFlow<Int>
     val daylilyComplete: StateFlow<Boolean>
+    fun logoutPlayer()
 }
 
 class HomeVM (
-    private val app: Application
+    private val userPreferencesRepository: UserPreferencesRepository
     ) : HomeViewModel, ViewModel() {
 
     override val fullName: StateFlow<String> = PlayerRepository.fullName
@@ -34,12 +36,17 @@ class HomeVM (
 
     override val daylilyComplete: StateFlow<Boolean> = PlayerRepository.completedDaily
 
+    override fun logoutPlayer() {
+        PlayerRepository.logout()
+        viewModelScope.launch { userPreferencesRepository.clearUser() }
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val app = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
                         as PaceFriendsApplication)
-                HomeVM(app = app)
+                HomeVM(app.userPreferencesRepository)
             }
         }
     }
@@ -52,4 +59,5 @@ class FakeHomeVM : HomeViewModel {
     override val weeklyScore = MutableStateFlow(12_340L)
     override val streak = MutableStateFlow(5)
     override val daylilyComplete = MutableStateFlow(true)
+    override fun logoutPlayer() { }
 }

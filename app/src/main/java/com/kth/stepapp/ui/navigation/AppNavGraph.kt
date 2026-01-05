@@ -13,6 +13,7 @@ import com.kth.stepapp.ui.viewmodels.LoginVM
 import com.kth.stepapp.ui.screens.CalendarScreen
 import com.kth.stepapp.ui.viewmodels.CalendarVM
 import com.kth.stepapp.ui.screens.ProfileScreen
+import com.kth.stepapp.ui.viewmodels.HomeVM
 import com.kth.stepapp.ui.viewmodels.ProfileVM
 
 
@@ -27,7 +28,10 @@ fun AppNavGraph() {
     ) {
 
         composable(Routes.HOME) {
+            val homeVM: HomeVM = viewModel(factory = HomeVM.Factory)
+
             HomeScreen(
+                vm = homeVM,
                 onGoToActivity = {
                     navController.navigate(Routes.ACTIVITY)
                 },
@@ -94,7 +98,5 @@ fun AppNavGraph() {
                 }
             )
         }
-
     }
 }
-
