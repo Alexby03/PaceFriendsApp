@@ -1,10 +1,14 @@
 package com.kth.stepapp.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.kth.stepapp.PaceFriendsApplication
 import com.kth.stepapp.ui.screens.ActivityScreen
 import com.kth.stepapp.ui.screens.HomeScreen
 import com.kth.stepapp.ui.screens.LoginScreen
@@ -32,8 +36,8 @@ fun AppNavGraph() {
 
             HomeScreen(
                 vm = homeVM,
-                onGoToActivity = {
-                    navController.navigate(Routes.ACTIVITY)
+                onGoToActivity = { type ->
+                    navController.navigate("activity/$type")
                 },
                 onGoToCalendar = {
                     navController.navigate(Routes.CALENDAR)
@@ -66,8 +70,19 @@ fun AppNavGraph() {
 
         }
 
-        composable(Routes.ACTIVITY) {
-            val activityViewModel: ActivityVM = viewModel(factory = ActivityVM.Factory)
+        composable(
+            route = Routes.ACTIVITY,
+            arguments = listOf(navArgument("type") { type = NavType.StringType })
+        ) { backStackEntry ->
+
+            val activityType = backStackEntry.arguments?.getString("type") ?: "Walking"
+
+            val activityViewModel: ActivityVM = viewModel(
+                factory = ActivityVM.provideFactory(
+                    app = LocalContext.current.applicationContext as PaceFriendsApplication,
+                    activityType = activityType
+                )
+            )
 
             ActivityScreen(
                 vm = activityViewModel,

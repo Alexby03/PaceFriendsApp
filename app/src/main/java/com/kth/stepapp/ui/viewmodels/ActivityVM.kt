@@ -18,15 +18,16 @@ interface ActivityViewModel {
     val caloriesBurned: StateFlow<Int>
     val walkingTimeSeconds: StateFlow<Long>
     val locationUiState: StateFlow<LocationUiState>
-    //val currentMapTile: StateFlow<Bitmap?>
     val isTracking: StateFlow<Boolean>
     val areaInSqMeters: StateFlow<Double>
+    val currentActivity: String
     fun startTracking()
     fun stopTracking()
 }
 
 class ActivityVM(
-    private val app: Application
+    private val app: Application,
+    activityType: String
 ) : ActivityViewModel, ViewModel() {
 
     override val nrOfSteps = TrackingRepository.nrOfSteps
@@ -35,9 +36,7 @@ class ActivityVM(
     override val locationUiState = TrackingRepository.locationUiState
     override val isTracking = TrackingRepository.isTracking
     override val areaInSqMeters = TrackingRepository.areaInSqMeters
-
-    //private val _currentMapTile: MutableStateFlow<Bitmap?> = MutableStateFlow(null)
-    //override val currentMapTile = _currentMapTile.asStateFlow()
+    override val currentActivity: String = activityType
 
     override fun startTracking() {
         Intent(app, TrackingService::class.java).also {
@@ -54,42 +53,14 @@ class ActivityVM(
         //saveRun()
     }
 
-//    fun saveRun() {
-//        viewModelScope.launch {
-//            // Take current values from the static Repository
-//            val finalSteps = TrackingRepository.nrOfSteps.value
-//            val finalCals = TrackingRepository.caloriesBurned.value
-//
-//            // Save to database
-//            historyRepository.insertRun(date = now(), steps = finalSteps, calories = finalCals)
-//        }
-//    }
-//
-//    init {
-//        viewModelScope.launch {
-//            locationUiState.collect { state ->
-//                Log.d("ActivityVM", "Location update: ${state.currentLat}, ${state.currentLng}")
-//                val lat = state.currentLat
-//                val lon = state.currentLng
-//                if (lat == 0.0 && lon == 0.0) return@collect
-//
-//                val zoom = 16
-//
-//                val bitmap = MapRepository.getMapTile(lat, lon, zoom)
-//                Log.d("ActivityVM", "Bitmap result: $bitmap")
-//                if (bitmap != null) {
-//                    _currentMapTile.value = bitmap
-//                }
-//            }
-//        }
-//    }
-
     companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val app = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
-                        as PaceFriendsApplication)
-                ActivityVM(app = app)
+        fun provideFactory(
+            app: Application,
+            activityType: String
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return ActivityVM(app, activityType) as T
             }
         }
     }
@@ -106,9 +77,9 @@ class FakeActivityVM: ActivityViewModel {
 
     override val isTracking = MutableStateFlow(false)
 
-    //override val currentMapTile = MutableStateFlow(null)
-
     override val areaInSqMeters = MutableStateFlow(0.0)
+
+    override val currentActivity = "Walking"
 
     override fun startTracking() { }
 

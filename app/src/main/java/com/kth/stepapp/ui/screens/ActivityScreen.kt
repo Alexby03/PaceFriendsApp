@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -44,6 +45,7 @@ fun ActivityScreen(
     val isTracking by vm.isTracking.collectAsState(initial = false)
     val locationState by vm.locationUiState.collectAsState()
     val currentArea by vm.areaInSqMeters.collectAsState()
+    val activityType = vm.currentActivity
     val minutes = timeSeconds / 60
     val context = LocalContext.current
     val isPreview = LocalInspectionMode.current
@@ -87,6 +89,31 @@ fun ActivityScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back"
+                        )
+                    }
+                },
+                actions = {
+                    Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = 8.dp)
+                    ) {
+                        val icon = when (activityType) {
+                            "Running" -> Icons.Default.Info
+                            "Jogging" -> Icons.Default.Info
+                            else -> Icons.Default.Info
+                        }
+
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Text(
+                            activityType, fontSize = 20.sp,
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }
