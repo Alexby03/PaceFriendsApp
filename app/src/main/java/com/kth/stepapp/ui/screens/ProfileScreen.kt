@@ -41,21 +41,66 @@ fun ProfileScreen(
 
         Column(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(padding)
-                .padding(24.dp),
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            ProfileItem("Name", fullName)
-            ProfileItem("Email", email)
-            ProfileItem("Age", age?.toString())
-            ProfileItem("Height", height?.let { "$it cm" })
-            ProfileItem("Weight", weight?.let { "$it kg" })
-            ProfileItem("Gender", gender)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = fullName ?: "Unnamed user",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
 
-            Spacer(modifier = Modifier.height(24.dp))
-    
-            // TODO fix that edit has function
+                    Divider(
+                        thickness = 3.dp,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+
+                    Text(
+                        text = email ?: "No email set",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+
+                    ProfileItem("Age", age?.toString())
+                    Divider(
+                        thickness = 3.dp,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+
+                    ProfileItem("Height", height?.let { "$it cm" })
+                    Divider(
+                        thickness = 3.dp,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+
+                    ProfileItem("Weight", weight?.let { "$it kg" })
+                    Divider(
+                        thickness = 3.dp,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+
+                    ProfileItem("Gender", gender)
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
             Button(
                 onClick = vm::onEditProfile,
                 modifier = Modifier.fillMaxWidth()
@@ -66,6 +111,7 @@ fun ProfileScreen(
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
@@ -75,7 +121,6 @@ fun ProfileScreenPreview() {
     )
 }
 
-// TODO Put thia function in a different packaged later
 @Composable
 private fun ProfileItem(
     label: String,
