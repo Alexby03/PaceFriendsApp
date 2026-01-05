@@ -51,7 +51,9 @@ fun AppNavGraph() {
             LoginScreen(
                 vm = loginVM,
                 onSuccess = {
-                    navController.popBackStack(Routes.HOME, false)
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
                 },
                 onBack = {
                     navController.popBackStack()

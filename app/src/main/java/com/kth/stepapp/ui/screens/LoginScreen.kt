@@ -1,5 +1,6 @@
 package com.kth.stepapp.ui.screens
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -8,15 +9,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kth.stepapp.ui.viewmodels.FakeLoginVM
 import com.kth.stepapp.ui.viewmodels.LoginViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun LoginScreen(
     vm: LoginViewModel,
@@ -34,8 +35,7 @@ fun LoginScreen(
     val isSaved by vm.isSaved.collectAsStateWithLifecycle()
     val error by vm.error.collectAsStateWithLifecycle()
 
-    val isLoggingIn = false
-    val isRegistering = false
+    var isRegisteringMode by remember { mutableStateOf(false) }
 
     LaunchedEffect(isSaved) {
         if (isSaved) onSuccess()
@@ -44,7 +44,7 @@ fun LoginScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Create Profile") },
+                title = { Text(if (isRegisteringMode) "Create Profile" else "Welcome Back") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -59,105 +59,177 @@ fun LoginScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            AnimatedContent(
+                targetState = isRegisteringMode,
+                label = "AuthSwitch",
+                transitionSpec = {
+                    fadeIn() + slideInVertically { it / 2 } with fadeOut() + slideOutVertically { -it / 2 }
+                }
+            ) { isRegistering ->
+                if (isRegistering) {
+                    RegisterContent(
+                        vm = vm,
+                        fullName = fullName,
+                        email = email,
+                        password = password,
+                        age = age,
+                        heightCm = heightCm,
+                        weightKg = weightKg,
+                        gender = gender,
+                        onSwitchToLogin = { isRegisteringMode = false }
+                    )
+                } else {
+                    LoginContent(
+                        vm = vm,
+                        email = email,
+                        password = password,
+                        onSwitchToRegister = { isRegisteringMode = true }
+                    )
+                }
+            }
+            
+            error?.let {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = it, color = MaterialTheme.colorScheme.error)
+            }
+        }
+    }
+}
 
-            OutlinedTextField(
-                value = fullName,
-                onValueChange = vm::onFullNameChange,
-                label = { Text("Full name") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true ,
-                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary)
-            )
+@Composable
+fun LoginContent(
+    vm: LoginViewModel,
+    email: String,
+    password: String,
+    onSwitchToRegister: () -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        OutlinedTextField(
+            value = email,
+            onValueChange = vm::onEmailChange,
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+        )
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = vm::onEmailChange,
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary)
-            )
+        OutlinedTextField(
+            value = password,
+            onValueChange = vm::onPasswordChange,
+            label = { Text("Password") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
 
-            OutlinedTextField(
-                value = password,
-                onValueChange = vm::onPasswordChange,
-                label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary)
-            )
+        Button(
+            onClick = vm::onLogin,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Login")
+        }
 
+        TextButton(onClick = onSwitchToRegister) {
+            Text("Don't have an account? Create Profile")
+        }
+    }
+}
+
+@Composable
+fun RegisterContent(
+    vm: LoginViewModel,
+    fullName: String,
+    email: String,
+    password: String,
+    age: String,
+    heightCm: String,
+    weightKg: String,
+    gender: String,
+    onSwitchToLogin: () -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        OutlinedTextField(
+            value = fullName,
+            onValueChange = vm::onFullNameChange,
+            label = { Text("Full name") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = vm::onEmailChange,
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+        )
+
+        OutlinedTextField(
+            value = password,
+            onValueChange = vm::onPasswordChange,
+            label = { Text("Password") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedTextField(
                 value = age,
-                onValueChange = { newValue ->
-                    if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
-                        vm.onAgeChange(newValue)
-                    }
-                },
+                onValueChange = { if (it.all { c -> c.isDigit() }) vm.onAgeChange(it) },
                 label = { Text("Age") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.weight(1f),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
-
-            OutlinedTextField(
-                value = heightCm,
-                onValueChange = { newValue ->
-                    if (newValue.isEmpty() ||
-                        newValue.matches(Regex("""\d*\.?\d*"""))
-                    ) {
-                        vm.onHeightChange(newValue)
-                    }
-                },
-                label = { Text("Height (cm)") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary)
-            )
-
-            OutlinedTextField(
-                value = weightKg,
-                onValueChange = { newValue ->
-                    if (newValue.isEmpty() ||
-                        newValue.matches(Regex("""\d*\.?\d*"""))
-                    ) {
-                        vm.onWeightChange(newValue)
-                    }
-                },
-                label = { Text("Weight (kg)") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary),)
-
             OutlinedTextField(
                 value = gender,
                 onValueChange = vm::onGenderChange,
                 label = { Text("Gender") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary),
+                modifier = Modifier.weight(1f),
+                singleLine = true
             )
+        }
 
-            error?.let {
-                Text(text = it, color = MaterialTheme.colorScheme.error)
-            }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(
+                value = heightCm,
+                onValueChange = { if (it.matches(Regex("""\d*\.?\d*"""))) vm.onHeightChange(it) },
+                label = { Text("Height (cm)") },
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+            )
+            OutlinedTextField(
+                value = weightKg,
+                onValueChange = { if (it.matches(Regex("""\d*\.?\d*"""))) vm.onWeightChange(it) },
+                label = { Text("Weight (kg)") },
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+            )
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = vm::onRegister,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Create Profile")
+        }
 
-            Button(
-                onClick = vm::onSubmit,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Create Profile")
-            }
+        TextButton(onClick = onSwitchToLogin) {
+            Text("Already have an account? Login")
         }
     }
 }
@@ -171,5 +243,3 @@ fun LoginScreenPreview() {
         onBack = {}
     )
 }
-
-
