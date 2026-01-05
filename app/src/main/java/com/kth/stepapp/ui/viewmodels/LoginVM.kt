@@ -9,9 +9,9 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kth.stepapp.PaceFriendsApplication
 import com.kth.stepapp.core.entities.PlayerDto
-import com.kth.stepapp.data.models.UserProfile
+import com.kth.stepapp.core.entities.PlayerLoginDto
 import com.kth.stepapp.data.repositories.PaceFriendsRepository
-import com.kth.stepapp.data.repository.ProfileRepository
+import com.kth.stepapp.data.repositories.PlayerRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -36,7 +36,8 @@ interface LoginViewModel {
     fun onWeightChange(value: String)
     fun onGenderChange(value: String)
 
-    fun onSubmit()
+    fun onRegister()
+    fun onLogin()
 }
 
 class LoginVM(
@@ -101,7 +102,7 @@ class LoginVM(
         _gender.value = value
     }
 
-    override fun onSubmit() {
+    override fun onRegister() {
 
         val player = try {
             PlayerDto(
@@ -132,7 +133,24 @@ class LoginVM(
                 val result = paceFriendsRepository.registerUser(player)
 
                 if (result != null) {
-                    Log.d("OkHttp", result.toString())
+                    PlayerRepository.login(PlayerDto(
+                        result.playerId,
+                        result.fullName,
+                        result.email,
+                        result.password,
+                        result.age,
+                        result.heightCm,
+                        result.weightKg,
+                        result.gender,
+                        result.currentStreak,
+                        result.completedDaily,
+                        result.weekScore,
+                        result.totalTimePlayed,
+                        result.weeklySteps,
+                        result.lastUpdated,
+                        result.totalScore
+                    ))
+                    Log.d("OkHttp", PlayerRepository.playerId.value.toString())
                     _isSaved.value = true
                     _error.value = null
                 } else {
@@ -142,6 +160,52 @@ class LoginVM(
                 _error.value = "Network error: ${e.message}"
             }
         }
+    }
+
+    override fun onLogin() {
+        val login = try {
+            PlayerLoginDto(
+                _email.value,
+                _password.value,
+            )
+        } catch (e: Exception) {
+            _error.value = "Invalid input values"
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val result = paceFriendsRepository.login(login.email, login.password)
+
+                if (result != null) {
+                    PlayerRepository.login(PlayerDto(
+                        result.playerId,
+                        result.fullName,
+                        result.email,
+                        result.password,
+                        result.age,
+                        result.heightCm,
+                        result.weightKg,
+                        result.gender,
+                        result.currentStreak,
+                        result.completedDaily,
+                        result.weekScore,
+                        result.totalTimePlayed,
+                        result.weeklySteps,
+                        result.lastUpdated,
+                        result.totalScore
+                    ))
+                    Log.d("OkHttp", PlayerRepository.playerId.value.toString())
+                    _isSaved.value = true
+                    _error.value = null
+                } else {
+                    _error.value = "Login failed (Server Error)"
+                }
+            } catch (e: Exception) {
+                _error.value = "Network error: ${e.message}"
+            }
+        }
+
     }
 
 
@@ -175,5 +239,6 @@ class FakeLoginVM : LoginViewModel {
     override fun onHeightChange(value: String) {}
     override fun onWeightChange(value: String) {}
     override fun onGenderChange(value: String) {}
-    override fun onSubmit() {}
+    override fun onRegister() {}
+    override fun onLogin() {}
 }
