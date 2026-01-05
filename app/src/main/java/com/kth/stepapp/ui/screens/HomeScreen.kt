@@ -12,7 +12,7 @@ import com.kth.stepapp.ui.theme.StepAppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onGoToDemo: () -> Unit,
+    onGoToActivity: () -> Unit,
     onGoToLogin: () -> Unit,
     onGoToCalendar: () -> Unit,
     onGoToProfile: () -> Unit
@@ -43,8 +43,8 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = onGoToDemo) {
-                Text("Go to Demo")
+            Button(onClick = onGoToActivity) {
+                Text("Go to Activity")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -67,7 +67,7 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     StepAppTheme {
         HomeScreen(
-            onGoToDemo = {},
+            onGoToActivity = {},
             onGoToLogin = {},
             onGoToCalendar = {},
             onGoToProfile = {}

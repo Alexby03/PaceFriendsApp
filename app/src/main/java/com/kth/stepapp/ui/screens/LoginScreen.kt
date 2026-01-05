@@ -34,6 +34,9 @@ fun LoginScreen(
     val isSaved by vm.isSaved.collectAsStateWithLifecycle()
     val error by vm.error.collectAsStateWithLifecycle()
 
+    val isLoggingIn = false
+    val isRegistering = false
+
     LaunchedEffect(isSaved) {
         if (isSaved) onSuccess()
     }

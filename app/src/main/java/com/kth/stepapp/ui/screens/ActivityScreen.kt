@@ -4,8 +4,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import android.Manifest
 import android.content.pm.PackageManager
-import android.os.Build
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -26,8 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.kth.stepapp.ui.theme.StepAppTheme
-import com.kth.stepapp.ui.viewmodels.DemoViewModel
-import com.kth.stepapp.ui.viewmodels.FakeDemoVM
+import com.kth.stepapp.ui.viewmodels.ActivityViewModel
+import com.kth.stepapp.ui.viewmodels.FakeActivityVM
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -36,8 +34,8 @@ import kotlin.text.format
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DemoScreen(
-    vm: DemoViewModel,
+fun ActivityScreen(
+    vm: ActivityViewModel,
     onBack: () -> Unit
 ) {
     val steps by vm.nrOfSteps.collectAsState()
@@ -58,7 +56,6 @@ fun DemoScreen(
         val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
         hasPermissions = granted
-        if (!granted) Log.d("DemoScreen", "Permissions denied")
     }
 
     LaunchedEffect(Unit) {
@@ -229,10 +226,10 @@ fun DemoScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun DemoScreenPreview() {
+fun ActivityScreenPreview() {
     StepAppTheme {
-        DemoScreen(
-            vm = FakeDemoVM(),
+        ActivityScreen(
+            vm = FakeActivityVM(),
             onBack = {}
         )
     }

@@ -5,10 +5,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.kth.stepapp.ui.screens.DemoScreen
+import com.kth.stepapp.ui.screens.ActivityScreen
 import com.kth.stepapp.ui.screens.HomeScreen
 import com.kth.stepapp.ui.screens.LoginScreen
-import com.kth.stepapp.ui.viewmodels.DemoVM
+import com.kth.stepapp.ui.viewmodels.ActivityVM
 import com.kth.stepapp.ui.viewmodels.LoginVM
 import com.kth.stepapp.ui.screens.CalendarScreen
 import com.kth.stepapp.ui.viewmodels.CalendarVM
@@ -23,13 +23,13 @@ fun AppNavGraph() {
 
     NavHost(
         navController = navController,
-        startDestination = Routes.HOME
+        startDestination = Routes.LOGIN
     ) {
 
         composable(Routes.HOME) {
             HomeScreen(
-                onGoToDemo = {
-                    navController.navigate(Routes.DEMO)
+                onGoToActivity = {
+                    navController.navigate(Routes.ACTIVITY)
                 },
                 onGoToLogin = {
                     navController.navigate(Routes.LOGIN)
@@ -59,11 +59,11 @@ fun AppNavGraph() {
 
         }
 
-        composable(Routes.DEMO) {
-            val demoViewModel: DemoVM = viewModel(factory = DemoVM.Factory)
+        composable(Routes.ACTIVITY) {
+            val activityViewModel: ActivityVM = viewModel(factory = ActivityVM.Factory)
 
-            DemoScreen(
-                vm = demoViewModel,
+            ActivityScreen(
+                vm = activityViewModel,
                 onBack = {
                     navController.popBackStack()
                 }

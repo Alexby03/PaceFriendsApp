@@ -2,11 +2,8 @@ package com.kth.stepapp.ui.viewmodels
 
 import android.app.Application
 import android.content.Intent
-import android.graphics.Bitmap
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kth.stepapp.PaceFriendsApplication
@@ -15,10 +12,8 @@ import com.kth.stepapp.core.services.TrackingService
 import com.kth.stepapp.data.repositories.TrackingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
-interface DemoViewModel {
+interface ActivityViewModel {
     val nrOfSteps: StateFlow<Long>
     val caloriesBurned: StateFlow<Int>
     val walkingTimeSeconds: StateFlow<Long>
@@ -30,9 +25,9 @@ interface DemoViewModel {
     fun stopTracking()
 }
 
-class DemoVM(
+class ActivityVM(
     private val app: Application
-) : DemoViewModel, ViewModel() {
+) : ActivityViewModel, ViewModel() {
 
     override val nrOfSteps = TrackingRepository.nrOfSteps
     override val caloriesBurned = TrackingRepository.caloriesBurned
@@ -73,7 +68,7 @@ class DemoVM(
 //    init {
 //        viewModelScope.launch {
 //            locationUiState.collect { state ->
-//                Log.d("DemoVM", "Location update: ${state.currentLat}, ${state.currentLng}")
+//                Log.d("ActivityVM", "Location update: ${state.currentLat}, ${state.currentLng}")
 //                val lat = state.currentLat
 //                val lon = state.currentLng
 //                if (lat == 0.0 && lon == 0.0) return@collect
@@ -81,7 +76,7 @@ class DemoVM(
 //                val zoom = 16
 //
 //                val bitmap = MapRepository.getMapTile(lat, lon, zoom)
-//                Log.d("DemoVM", "Bitmap result: $bitmap")
+//                Log.d("ActivityVM", "Bitmap result: $bitmap")
 //                if (bitmap != null) {
 //                    _currentMapTile.value = bitmap
 //                }
@@ -94,13 +89,13 @@ class DemoVM(
             initializer {
                 val app = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
                         as PaceFriendsApplication)
-                DemoVM(app = app)
+                ActivityVM(app = app)
             }
         }
     }
 }
 
-class FakeDemoVM: DemoViewModel {
+class FakeActivityVM: ActivityViewModel {
     override val nrOfSteps = MutableStateFlow(1L)
 
     override val caloriesBurned = MutableStateFlow(180)

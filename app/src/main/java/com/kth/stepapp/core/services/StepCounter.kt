@@ -19,9 +19,9 @@ class StepCounter(context: Context) {
 
     fun getStepCounts(): Flow<Long> = callbackFlow {
         if (sensor == null) {
-            Log.e("DemoVM", "CRITICAL: This device has NO Step Counter sensor!")
+            Log.e("ActivityVM", "CRITICAL: This device has NO Step Counter sensor!")
         } else {
-            Log.d("DemoVM", "Sensor found: ${sensor!!.name}")
+            Log.d("ActivityVM", "Sensor found: ${sensor!!.name}")
         }
 
         var initialSteps: Long? = null
