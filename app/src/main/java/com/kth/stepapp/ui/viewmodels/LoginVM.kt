@@ -15,6 +15,7 @@ import com.kth.stepapp.data.repository.ProfileRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 interface LoginViewModel {
     val fullName: StateFlow<String>
@@ -113,7 +114,11 @@ class LoginVM(
                 _weightKg.value.toDouble(),
                 _gender.value,
                 0,
+                false,
                 0,
+                0,
+                0,
+                Instant.now().toString(),
                 0
             )
         } catch (e: Exception) {

@@ -31,18 +31,19 @@ fun AppNavGraph() {
                 onGoToActivity = {
                     navController.navigate(Routes.ACTIVITY)
                 },
-                onGoToLogin = {
-                    navController.navigate(Routes.LOGIN)
-                },
                 onGoToCalendar = {
                     navController.navigate(Routes.CALENDAR)
                 },
                 onGoToProfile = {
                     navController.navigate(Routes.PROFILE)
+                },
+                onLogout = {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.HOME) { inclusive = true }
+                    }
                 }
             )
         }
-
 
         composable(Routes.LOGIN) {
             val loginVM: LoginVM = viewModel(factory = LoginVM.Factory)
