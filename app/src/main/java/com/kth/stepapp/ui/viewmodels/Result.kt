@@ -8,13 +8,13 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kth.stepapp.PaceFriendsApplication
 
 
-interface ScoreAndMapViewModel {
+interface ResultViewModel {
 
 }
 
-class ScoreAndMapVM(
+class ResultVM(
     private val app: Application
-) : ScoreAndMapViewModel, ViewModel() {
+) : ResultViewModel, ViewModel() {
 
 
 
@@ -23,12 +23,12 @@ class ScoreAndMapVM(
             initializer {
                 val app = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
                         as PaceFriendsApplication)
-                ScoreAndMapVM(app = app)
+                ResultVM(app = app)
             }
         }
     }
 }
 
-class FakeScoreAndMapVM: ScoreAndMapViewModel {
+class FakeScoreAndMapVM: ResultViewModel {
 
 }

@@ -1,5 +1,6 @@
 package com.kth.stepapp.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -23,6 +24,23 @@ import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.*
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.kth.stepapp.core.entities.DayDetailDto
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.BoundingBox
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Polyline
+import java.time.format.DateTimeFormatter
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +50,7 @@ fun CalendarScreen(
 ) {
     val currentMonth by vm.currentMonth.collectAsStateWithLifecycle()
     val selectedDate by vm.selectedDate.collectAsStateWithLifecycle()
+    val dayDetail by vm.dayDetail.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -46,10 +65,7 @@ fun CalendarScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -66,6 +82,7 @@ fun CalendarScreen(
 
         Column(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
         ) {
@@ -77,10 +94,44 @@ fun CalendarScreen(
             CalendarGrid(
                 yearMonth = currentMonth,
                 selectedDate = selectedDate,
-                onDateClick = { date ->
-                    vm.onDateSelected(date)
-                }
+                onDateClick = vm::onDateSelected
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ─── Selected Day ─────────────────────────────
+            selectedDate?.let { date ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                ) {
+                    Text(
+                        text = date.format(
+                            DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy")
+                        ),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            // ─── Day Details ─────────────────────────────
+            dayDetail?.let {
+                DayDetailCard(it)
+            } ?: run {
+                selectedDate?.let {
+                    Text(
+                        text = "No data for this day",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 8.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
     }
 }
@@ -94,7 +145,6 @@ fun CalendarScreenPreview() {
     )
 }
 
-// TODO Put thia function in a different packaged later
 @Composable
 private fun DaysOfWeekHeader() {
     Row(modifier = Modifier.fillMaxWidth()) {
@@ -109,7 +159,6 @@ private fun DaysOfWeekHeader() {
     }
 }
 
-// TODO Put thia function in a different packaged later
 @Composable
 private fun CalendarGrid(
     yearMonth: YearMonth,
@@ -148,7 +197,6 @@ private fun CalendarGrid(
     }
 }
 
-// TODO Put thia function in a different packaged later
 @Composable
 private fun DayCell(
     date: LocalDate,
@@ -172,3 +220,121 @@ private fun DayCell(
         }
     }
 }
+
+@Composable
+private fun DayDetailCard(detail: DayDetailDto) {
+
+    val isPreview = LocalInspectionMode.current
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            Text(
+                text = "Day summary",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text("Steps: ${detail.steps}")
+            Text("Calories: ${detail.calories}")
+            Text("Score: ${detail.score}")
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(220.dp)
+                    .clip(RoundedCornerShape(16.dp))
+            ) {
+                if (isPreview) {
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.LightGray),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Map preview")
+                    }
+
+                } else {
+
+                    val geoPoints = remember(detail.routePoints) {
+                        detail.routePoints.map {
+                            GeoPoint(it.latitude, it.longitude)
+                        }
+                    }
+
+                    val mapView = rememberMapViewWithLifecycle()
+
+                    AndroidView(
+                        modifier = Modifier.fillMaxSize(),
+                        factory = { mapView },
+                        update = { map ->
+
+                            if (geoPoints.isEmpty()) return@AndroidView
+
+                            map.overlays.clear()
+
+                            val polyline = Polyline().apply {
+                                outlinePaint.color = android.graphics.Color.RED
+                                outlinePaint.strokeWidth = 8f
+                                setPoints(geoPoints)
+                            }
+
+                            map.overlays.add(polyline)
+
+                            val boundingBox =
+                                BoundingBox.fromGeoPointsSafe(geoPoints)
+                            map.zoomToBoundingBox(boundingBox, true)
+
+                            map.invalidate()
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun rememberMapViewWithLifecycle(): MapView {
+    val context = LocalContext.current
+    val mapView = remember {
+        MapView(context).apply {
+            setTileSource(TileSourceFactory.MAPNIK)
+            setMultiTouchControls(false)
+            controller.setZoom(17.0)
+        }
+    }
+
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                Lifecycle.Event.ON_DESTROY -> mapView.onDetach()
+                else -> Unit
+            }
+        }
+        lifecycle.addObserver(observer)
+        onDispose {
+            lifecycle.removeObserver(observer)
+        }
+    }
+
+    return mapView
+}
+
+
+
+
