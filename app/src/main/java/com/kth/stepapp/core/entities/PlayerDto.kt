@@ -27,12 +27,24 @@ data class PlayerDto(
     @SerializedName("gender")
     val gender: String,
 
-    @SerializedName("totalScore")
-    val totalScore: Long,
-
     @SerializedName("currentStreak")
     val currentStreak: Int,
 
+    @SerializedName("completedDaily")
+    val completedDaily: Boolean,
+
     @SerializedName("weekScore")
-    val weekScore: Long
+    val weekScore: Long,
+
+    @SerializedName("totalTimePlayed")
+    val totalTimePlayed: Long,
+
+    @SerializedName("weeklySteps")
+    val weeklySteps: Long,
+
+    @SerializedName("lastUpdated")
+    val lastUpdated: String,
+
+    @SerializedName("totalScore")
+    val totalScore: Long
 )
