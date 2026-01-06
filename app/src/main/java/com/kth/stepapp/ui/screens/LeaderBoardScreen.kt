@@ -2,6 +2,7 @@ package com.kth.stepapp.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,6 +41,7 @@ fun LeaderBoardScreen(
 ) {
     val leaderboard by vm.leaderboard.collectAsStateWithLifecycle()
     val isLoading by vm.isLoading.collectAsStateWithLifecycle()
+    val weeklyWinner by vm.weeklyWinner.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -70,6 +73,47 @@ fun LeaderBoardScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+
+                // 🏆 Winner of the week
+                weeklyWinner?.let { winner ->
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "🏆",
+                                    style = MaterialTheme.typography.headlineMedium
+                                )
+
+                                Spacer(modifier = Modifier.width(12.dp))
+
+                                Column {
+                                    Text(
+                                        text = "Winner of last week",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Text(
+                                        text = winner.fullName,
+                                        style = MaterialTheme.typography.titleLarge
+                                    )
+                                    Text(
+                                        text = "Score: ${winner.weekScore}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 🏅 Leaderboard list
                 itemsIndexed(leaderboard) { index, entry ->
                     LeaderBoardItem(
                         rank = index + 1,
@@ -81,6 +125,7 @@ fun LeaderBoardScreen(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

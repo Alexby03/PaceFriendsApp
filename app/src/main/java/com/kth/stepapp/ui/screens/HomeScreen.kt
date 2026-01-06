@@ -115,19 +115,30 @@ fun HomeScreen(
 
             Button(
                 onClick = onGoToCalendar,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
             ) {
-                Text("Calendar")
+                Text(
+                    text = "Calendar",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
-            Spacer(modifier = Modifier.height(70.dp))
+            Spacer(modifier = Modifier.height(50.dp))
 
             Button(
                 onClick = onGoToLeaderBoard,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
             ) {
-                Text("Leaderboard")
+                Text(
+                    text = "Leaderboard",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
+
 
             Divider(thickness = 2.dp)
 
