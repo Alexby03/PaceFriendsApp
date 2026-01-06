@@ -42,4 +42,7 @@ interface ApiService {
 
     @GET("api/leaderboard")
     suspend fun getLeaderboard(): Response<List<LeaderboardEntryDto>>
+
+    @GET("api/winner")
+    suspend fun getWinner(): Response<PlayerDto>
 }
