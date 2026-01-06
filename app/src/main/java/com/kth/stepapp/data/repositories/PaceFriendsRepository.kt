@@ -122,7 +122,7 @@ class PaceFriendsRepository {
     // =================================================================
     // Get Weekly Winner
     // =================================================================
-    suspend fun getWinner(): PlayerDto? {
+    suspend fun getWinner(): WeeklyWinnerDto? {
         return try {
             val response = api.getWinner()
             if (response.isSuccessful) {

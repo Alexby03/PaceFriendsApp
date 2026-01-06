@@ -44,7 +44,7 @@ interface ApiService {
     suspend fun getLeaderboard(): Response<List<LeaderboardEntryDto>>
 
     @GET("api/winner")
-    suspend fun getWinner(): Response<PlayerDto>
+    suspend fun getWinner(): Response<WeeklyWinnerDto>
 
     @GET("api/player/{playerId}")
     suspend fun getPlayer(

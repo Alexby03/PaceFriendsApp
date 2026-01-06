@@ -1,6 +1,7 @@
 package com.kth.stepapp.ui.viewmodels
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kth.stepapp.PaceFriendsApplication
 import com.kth.stepapp.core.entities.LeaderboardEntryDto
 import com.kth.stepapp.core.entities.PlayerDto
+import com.kth.stepapp.core.entities.WeeklyWinnerDto
 import com.kth.stepapp.data.repositories.PaceFriendsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +21,7 @@ interface LeaderBoardViewModel {
     val leaderboard: StateFlow<List<LeaderboardEntryDto>>
     val isLoading: StateFlow<Boolean>
 
-    val weeklyWinner: StateFlow<PlayerDto?>
+    val weeklyWinner: StateFlow<WeeklyWinnerDto?>
 }
 
 class LeaderBoardVM(
@@ -27,8 +29,12 @@ class LeaderBoardVM(
     private val paceFriendsRepository: PaceFriendsRepository
 ) : LeaderBoardViewModel, ViewModel() {
 
-    private val _weeklyWinner = MutableStateFlow<PlayerDto?>(null)
-    override val weeklyWinner: StateFlow<PlayerDto?> = _weeklyWinner
+    private val _weeklyWinner = MutableStateFlow<WeeklyWinnerDto?>(WeeklyWinnerDto(
+        "xxxx-xxxx",
+        "No Winner this week.",
+        0
+    ))
+    override val weeklyWinner: StateFlow<WeeklyWinnerDto?> = _weeklyWinner
 
     private val _leaderboard = MutableStateFlow<List<LeaderboardEntryDto>>(emptyList())
     override val leaderboard: StateFlow<List<LeaderboardEntryDto>> = _leaderboard
@@ -42,9 +48,15 @@ class LeaderBoardVM(
 
     private fun loadLeaderboard() {
         viewModelScope.launch {
+            Log.d("LeaderBoardVM", "Loading Leaderboard")
             _isLoading.value = true
             _leaderboard.value = paceFriendsRepository.getLeaderboard()
-            _weeklyWinner.value = paceFriendsRepository.getWinner()
+            val winner = paceFriendsRepository.getWinner()
+            Log.d("LeaderBoardVM", "Winner is: $winner")
+            if(winner != null) {
+                Log.d("LeaderBoardVM", "Winner is: ${_weeklyWinner.value}")
+                _weeklyWinner.value = winner
+            }
             _isLoading.value = false
         }
     }
@@ -74,22 +86,10 @@ class FakeLeaderBoardVM: LeaderBoardViewModel {
     )
 
     override val weeklyWinner = MutableStateFlow(
-        PlayerDto(
+        WeeklyWinnerDto(
             playerId = "1",
             fullName = "Alice",
-            email = "",
-            password = "",
-            age = 25,
-            heightCm = 170.0,
-            weightKg = 65.0,
-            gender = "Female",
-            currentStreak = 5,
-            completedDaily = true,
-            weekScore = 1200,
-            totalTimePlayed = 0,
-            weeklySteps = 0,
-            lastUpdated = "",
-            totalScore = 5000
+            score = 5431
         )
     )
 

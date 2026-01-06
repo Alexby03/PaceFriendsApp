@@ -104,7 +104,7 @@ fun LeaderBoardScreen(
                                         style = MaterialTheme.typography.titleLarge
                                     )
                                     Text(
-                                        text = "Score: ${winner.weekScore}",
+                                        text = "Score: ${winner.score}",
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
