@@ -22,7 +22,8 @@ fun HomeScreen(
     onGoToActivity: (String) -> Unit,
     onGoToCalendar: () -> Unit,
     onGoToProfile: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onGoToLeaderBoard: () -> Unit
 ) {
 
     val fullName by vm.fullName.collectAsState()
@@ -109,23 +110,40 @@ fun HomeScreen(
                 }
             }
 
+            Divider(thickness = 2.dp)
+
+
+            Button(
+                onClick = onGoToCalendar,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Calendar")
+            }
+
+            Spacer(modifier = Modifier.height(70.dp))
+
+            Button(
+                onClick = onGoToLeaderBoard,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Leaderboard")
+            }
+
+            Divider(thickness = 2.dp)
+
             Spacer(modifier = Modifier.weight(1f))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(onClick = onGoToCalendar) {
-                    Text("Calendar")
-                }
 
-                OutlinedButton(onClick = {
+            OutlinedButton(
+                onClick = {
                     vm.logoutPlayer()
                     onLogout()
-                }) {
-                    Text("Logout")
-                }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Logout")
             }
+
         }
     }
 }
@@ -139,7 +157,8 @@ fun HomeScreenPreview() {
             onGoToActivity = {},
             onGoToCalendar = {},
             onGoToProfile = {},
-            onLogout = {}
+            onLogout = {},
+            onGoToLeaderBoard = {}
         )
     }
 }

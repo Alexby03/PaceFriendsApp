@@ -15,10 +15,12 @@ import com.kth.stepapp.ui.screens.LoginScreen
 import com.kth.stepapp.ui.viewmodels.ActivityVM
 import com.kth.stepapp.ui.viewmodels.LoginVM
 import com.kth.stepapp.ui.screens.CalendarScreen
+import com.kth.stepapp.ui.screens.LeaderBoardScreen
 import com.kth.stepapp.ui.viewmodels.CalendarVM
 import com.kth.stepapp.ui.screens.ProfileScreen
 import com.kth.stepapp.ui.screens.ResultScreen
 import com.kth.stepapp.ui.viewmodels.HomeVM
+import com.kth.stepapp.ui.viewmodels.LeaderBoardVM
 import com.kth.stepapp.ui.viewmodels.ProfileVM
 import com.kth.stepapp.ui.viewmodels.ResultVM
 
@@ -45,6 +47,9 @@ fun AppNavGraph() {
                 },
                 onGoToProfile = {
                     navController.navigate(Routes.PROFILE)
+                },
+                onGoToLeaderBoard = {
+                    navController.navigate(Routes.LEADERBOARD)
                 },
                 onLogout = {
                     navController.navigate(Routes.LOGIN) {
@@ -132,5 +137,15 @@ fun AppNavGraph() {
                 }
             )
         }
+
+        composable(Routes.LEADERBOARD) {
+            val vm: LeaderBoardVM = viewModel(factory = LeaderBoardVM.Factory)
+
+            LeaderBoardScreen(
+                vm = vm,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
     }
 }
