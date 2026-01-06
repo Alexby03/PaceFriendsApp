@@ -2,6 +2,7 @@ package com.kth.stepapp.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,19 +32,12 @@ fun ResultScreen(
     val steps by vm.steps.collectAsStateWithLifecycle()
     val time by vm.timeSeconds.collectAsStateWithLifecycle()
     val calories by vm.calories.collectAsStateWithLifecycle()
+    val score by vm.score.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Workout result") },
-                actions = {
-                    OutlinedButton(
-                        onClick = onBack,
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
-                        Text("Done")
-                    }
-                }
             )
         }
     ) { padding ->
@@ -62,7 +56,6 @@ fun ResultScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
 
-                    // 🎉 Gratulationstext
                     Text(
                         text = "Great job!",
                         style = MaterialTheme.typography.headlineSmall
@@ -75,7 +68,6 @@ fun ResultScreen(
 
                     Divider(thickness = 2.dp)
 
-                    // 👣 Steps
                     Text(
                         text = "Steps",
                         style = MaterialTheme.typography.labelMedium
@@ -87,7 +79,6 @@ fun ResultScreen(
 
                     Divider(thickness = 2.dp)
 
-                    // 🔥 Calories
                     Text(
                         text = "Calories burned",
                         style = MaterialTheme.typography.labelMedium
@@ -99,7 +90,6 @@ fun ResultScreen(
 
                     Divider(thickness = 2.dp)
 
-                    // ⏱ Time
                     Text(
                         text = "Time",
                         style = MaterialTheme.typography.labelMedium
@@ -108,7 +98,32 @@ fun ResultScreen(
                         text = "${time / 60} min",
                         style = MaterialTheme.typography.titleLarge
                     )
+
+                    Divider(thickness = 2.dp)
+
+                    Text(
+                        text = "Score",
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                    Text(
+                        text = score.toString(),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
                 }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            OutlinedButton(
+                onClick = {
+                    vm.onDone()
+                    onBack()
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Done")
             }
 
         }

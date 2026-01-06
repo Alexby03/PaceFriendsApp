@@ -22,7 +22,7 @@ interface ResultViewModel {
     val steps: StateFlow<Long>
     val timeSeconds: StateFlow<Long>
     val calories: StateFlow<Int>
-
+    val score: StateFlow<Long>
     fun onDone()
 }
 
@@ -34,6 +34,10 @@ class ResultVM(
     override val steps = TrackingRepository.nrOfSteps
     override val timeSeconds = TrackingRepository.walkingTimeSeconds
     override val calories = TrackingRepository.caloriesBurned
+
+    override val score: StateFlow<Long> =
+        MutableStateFlow(TrackingRepository.calculateScore())
+
 
     override fun onDone() {
         viewModelScope.launch {
@@ -80,6 +84,7 @@ class FakeScoreAndMapVM: ResultViewModel {
     override val steps = MutableStateFlow(3421L)
     override val timeSeconds = MutableStateFlow(1800L)
     override val calories = MutableStateFlow(210)
+    override val score = MutableStateFlow(285L)
 
     override fun onDone() {}
 }
