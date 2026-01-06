@@ -35,7 +35,13 @@ class ProfileVM(
     override val gender: StateFlow<String> = PlayerRepository.gender
 
     override fun onEditProfile() {
-        // TODO: Navigate to EditProfileScreen
+        PlayerRepository.updateProfile(
+            fullName = fullName.value,
+            age = age.value,
+            heightCm = heightCm.value,
+            weightKg = weightKg.value,
+            gender = gender.value
+        )
     }
 
     companion object {

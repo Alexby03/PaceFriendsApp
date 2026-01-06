@@ -87,4 +87,19 @@ object PlayerRepository {
         _lastUpdated.value = ""
         _totalScore.value = 0
     }
+
+    fun updateProfile(
+        fullName: String,
+        age: Int,
+        heightCm: Double,
+        weightKg: Double,
+        gender: String
+    ) {
+        _fullName.value = fullName
+        _age.value = age
+        _heightCm.value = heightCm
+        _weightKg.value = weightKg
+        _gender.value = gender
+    }
+
 }
