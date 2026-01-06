@@ -152,6 +152,7 @@ class LoginVM(
                         result.totalScore
                     ))
                     Log.d("OkHttp", PlayerRepository.playerId.value.toString())
+                    userPreferencesRepository.saveUser(result.email, player.password!!)
                     _isSaved.value = true
                     _error.value = null
                 } else {
