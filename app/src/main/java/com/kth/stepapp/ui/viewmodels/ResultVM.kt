@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kth.stepapp.PaceFriendsApplication
 import com.kth.stepapp.core.entities.DayEntryDto
+import com.kth.stepapp.core.utils.ScoreCalculator
 import com.kth.stepapp.data.repositories.PlayerRepository
 import com.kth.stepapp.data.repositories.TrackingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,8 +45,8 @@ class ResultVM(
                 totalCalories = calories.value.toLong(),
                 timeSpentSeconds = timeSeconds.value,
                 areaInSquareMeters = TrackingRepository.areaInSqMeters.value,
-                score = steps.value,
-                activity = "Walking",
+                score = TrackingRepository.calculateScore(),
+                activity = TrackingRepository.activity.value,
                 routePoints = emptyList()
             )
 

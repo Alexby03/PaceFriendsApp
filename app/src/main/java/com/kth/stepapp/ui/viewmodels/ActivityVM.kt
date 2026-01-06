@@ -53,6 +53,7 @@ class ActivityVM(
     override val currentActivity: String = activityType
 
     override fun startTracking(activityType: String) {
+        TrackingRepository.setActivity(activityType)
         Intent(app, TrackingService::class.java).also {
             it.action = "START"
             it.putExtra("ACTIVITY_TYPE", activityType)
@@ -71,7 +72,7 @@ class ActivityVM(
                         totalCalories = caloriesBurned.value.toLong(),
                         timeSpentSeconds = walkingTimeSeconds.value,
                         areaInSquareMeters = if (closedCircuit) areaInSqMeters.value else 0.0,
-                        score = 0,
+                        score = TrackingRepository.calculateScore(),
                         activity = currentActivity,
                         routePoints = locationUiState.value.pathPoints.mapIndexed { index, pair ->
                             RoutePointDto(
