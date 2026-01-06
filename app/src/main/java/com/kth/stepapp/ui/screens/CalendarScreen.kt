@@ -51,6 +51,7 @@ fun CalendarScreen(
     val currentMonth by vm.currentMonth.collectAsStateWithLifecycle()
     val selectedDate by vm.selectedDate.collectAsStateWithLifecycle()
     val dayDetail by vm.dayDetail.collectAsStateWithLifecycle()
+    val daysWithData by vm.daysWithData.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -94,6 +95,7 @@ fun CalendarScreen(
             CalendarGrid(
                 yearMonth = currentMonth,
                 selectedDate = selectedDate,
+                daysWithData = daysWithData,
                 onDateClick = vm::onDateSelected
             )
 
@@ -163,6 +165,7 @@ private fun DaysOfWeekHeader() {
 private fun CalendarGrid(
     yearMonth: YearMonth,
     selectedDate: LocalDate?,
+    daysWithData: Set<LocalDate>,
     onDateClick: (LocalDate) -> Unit
 ) {
     val firstDayOfMonth = yearMonth.atDay(1)
@@ -190,6 +193,7 @@ private fun CalendarGrid(
                 DayCell(
                     date = date,
                     isSelected = date == selectedDate,
+                    hasData = daysWithData.contains(date),
                     onClick = { onDateClick(date) }
                 )
             }
@@ -201,25 +205,51 @@ private fun CalendarGrid(
 private fun DayCell(
     date: LocalDate,
     isSelected: Boolean,
+    hasData: Boolean,
     onClick: () -> Unit
 ) {
+    val backgroundColor = when {
+        isSelected ->
+            MaterialTheme.colorScheme.primary
+
+        hasData ->
+            MaterialTheme.colorScheme.secondaryContainer
+
+        else ->
+            MaterialTheme.colorScheme.surface
+    }
+
+    val textColor = when {
+        isSelected ->
+            MaterialTheme.colorScheme.onPrimary
+
+        hasData ->
+            MaterialTheme.colorScheme.onSecondaryContainer
+
+        else ->
+            MaterialTheme.colorScheme.onSurface
+    }
+
     Surface(
         modifier = Modifier
             .aspectRatio(1f)
             .clickable(onClick = onClick),
-        tonalElevation = if (isSelected) 4.dp else 0.dp,
-        shape = MaterialTheme.shapes.small
+        color = backgroundColor,
+        shape = RoundedCornerShape(8.dp),
+        tonalElevation = if (isSelected) 4.dp else 0.dp
     ) {
         Box(
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = date.dayOfMonth.toString(),
+                color = textColor,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
     }
 }
+
 
 @Composable
 private fun DayDetailCard(detail: DayDetailDto) {
@@ -295,7 +325,7 @@ private fun DayDetailCard(detail: DayDetailDto) {
                             val boundingBox =
                                 BoundingBox.fromGeoPointsSafe(geoPoints)
                             map.zoomToBoundingBox(boundingBox, true)
-
+                            map.controller.setZoom(map.zoomLevelDouble - 0.5)
                             map.invalidate()
                         }
                     )
