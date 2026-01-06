@@ -296,7 +296,8 @@ fun ActivityScreenPreview() {
     StepAppTheme {
         ActivityScreen(
             vm = FakeActivityVM(),
-            onBack = {}
+            onBack = {},
+            onResult = {}
         )
     }
 }

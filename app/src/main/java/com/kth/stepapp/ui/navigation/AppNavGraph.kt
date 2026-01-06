@@ -122,7 +122,14 @@ fun AppNavGraph() {
             val resultVM: ResultVM = viewModel(factory = ResultVM.Factory)
 
             ResultScreen(
-                vm = resultVM
+                vm = resultVM,
+                onBack = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.HOME) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
     }
