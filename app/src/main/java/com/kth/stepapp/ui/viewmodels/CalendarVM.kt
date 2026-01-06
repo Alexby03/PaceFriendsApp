@@ -51,13 +51,18 @@ class CalendarVM(
     private val _daysWithData = MutableStateFlow<Set<LocalDate>>(emptySet())
     override val daysWithData: StateFlow<Set<LocalDate>> = _daysWithData
 
+    init {
+        loadCalendarForMonth()
+    }
 
     override fun onNextMonth() {
         _currentMonth.value = _currentMonth.value.plusMonths(1)
+        loadCalendarForMonth()
     }
 
     override fun onPreviousMonth() {
         _currentMonth.value = _currentMonth.value.minusMonths(1)
+        loadCalendarForMonth()
     }
 
     override fun onDateSelected(date: LocalDate) {
@@ -101,7 +106,6 @@ class CalendarVM(
                 .toSet()
         }
     }
-
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
