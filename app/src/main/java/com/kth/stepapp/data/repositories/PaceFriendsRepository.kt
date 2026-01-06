@@ -118,4 +118,42 @@ class PaceFriendsRepository {
             emptyList()
         }
     }
+
+    // =================================================================
+    // Get Weekly Winner
+    // =================================================================
+    suspend fun getWinner(): PlayerDto? {
+        return try {
+            val response = api.getWinner()
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                Log.e("Repo", "GetWinner failed: ${response.code()} - ${response.message()}")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("Repo", "GetWinner network error", e)
+            null
+        }
+    }
+
+    // =================================================================
+    // Get Player By ID
+    // =================================================================
+    suspend fun getPlayer(playerId: String): PlayerDto? {
+        return try {
+            val response = api.getPlayer(playerId)
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                Log.e("Repo", "GetPlayer failed: ${response.code()} - ${response.message()}")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("Repo", "GetPlayer network error", e)
+            null
+        }
+    }
+
+
 }

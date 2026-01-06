@@ -45,4 +45,9 @@ interface ApiService {
 
     @GET("api/winner")
     suspend fun getWinner(): Response<PlayerDto>
+
+    @GET("api/player/{playerId}")
+    suspend fun getPlayer(
+        @Path("playerId") playerId: String
+    ): Response<PlayerDto>
 }

@@ -88,6 +88,22 @@ object PlayerRepository {
         _totalScore.value = 0
     }
 
+    fun refreshProfile(playerDto: PlayerDto) {
+        _fullName.value = playerDto.fullName
+        _email.value = playerDto.email
+        _age.value = playerDto.age
+        _heightCm.value = playerDto.heightCm
+        _weightKg.value = playerDto.weightKg
+        _gender.value = playerDto.gender
+        _currentStreak.value = playerDto.currentStreak
+        _completedDaily.value = playerDto.completedDaily
+        _weekScore.value = playerDto.weekScore
+        _totalTimePlayed.value = playerDto.totalTimePlayed
+        _weeklySteps.value = playerDto.weeklySteps
+        _lastUpdated.value = playerDto.lastUpdated
+        _totalScore.value = playerDto.totalScore
+    }
+
     fun updateProfile(
         fullName: String,
         age: Int,

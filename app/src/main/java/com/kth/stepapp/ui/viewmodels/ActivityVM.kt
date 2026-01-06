@@ -101,6 +101,10 @@ class ActivityVM(
         return GeometryUtils.calculateDistance(locationUiState.value.pathPoints) < 30f
     }
 
+    init {
+        TrackingRepository.reset()
+    }
+
     companion object {
         fun provideFactory(
             app: Application,
