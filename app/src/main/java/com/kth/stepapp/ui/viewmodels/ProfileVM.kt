@@ -19,29 +19,89 @@ interface ProfileViewModel {
         val weightKg: StateFlow<Double?>
         val gender: StateFlow<String?>
 
-        fun onEditProfile()
+        val isEditing: StateFlow<Boolean>
 
+        fun onEditProfile()
+        fun onSaveProfile()
+        fun onCancelEdit()
+
+        fun onFullNameChange(value: String)
+        fun onAgeChange(value: Int)
+        fun onHeightChange(value: Double)
+        fun onWeightChange(value: Double)
+        fun onGenderChange(value: String)
 }
 
 class ProfileVM(
     private val app: Application
 ) : ProfileViewModel, ViewModel() {
 
-    override val fullName: StateFlow<String> = PlayerRepository.fullName
-    override val email: StateFlow<String> = PlayerRepository.email
-    override val age: StateFlow<Int> = PlayerRepository.age
-    override val heightCm: StateFlow<Double> = PlayerRepository.heightCm
-    override val weightKg: StateFlow<Double> = PlayerRepository.weightKg
-    override val gender: StateFlow<String> = PlayerRepository.gender
+    // ─── Edit state ────────────────────────────────
+    private val _isEditing = MutableStateFlow(false)
+    override val isEditing: StateFlow<Boolean> = _isEditing
 
+    // ─── Editable fields (kopierade från repository) ─
+    private val _fullName = MutableStateFlow(PlayerRepository.fullName.value)
+    override val fullName: StateFlow<String> = _fullName
+
+    override val email: StateFlow<String> = PlayerRepository.email
+
+    private val _age = MutableStateFlow(PlayerRepository.age.value)
+    override val age: StateFlow<Int> = _age
+
+    private val _heightCm = MutableStateFlow(PlayerRepository.heightCm.value)
+    override val heightCm: StateFlow<Double> = _heightCm
+
+    private val _weightKg = MutableStateFlow(PlayerRepository.weightKg.value)
+    override val weightKg: StateFlow<Double> = _weightKg
+
+    private val _gender = MutableStateFlow(PlayerRepository.gender.value)
+    override val gender: StateFlow<String> = _gender
+
+    // ─── Edit lifecycle ────────────────────────────
     override fun onEditProfile() {
+        _isEditing.value = true
+    }
+
+    override fun onCancelEdit() {
+        _fullName.value = PlayerRepository.fullName.value
+        _age.value = PlayerRepository.age.value
+        _heightCm.value = PlayerRepository.heightCm.value
+        _weightKg.value = PlayerRepository.weightKg.value
+        _gender.value = PlayerRepository.gender.value
+        _isEditing.value = false
+    }
+
+    override fun onSaveProfile() {
         PlayerRepository.updateProfile(
-            fullName = fullName.value,
-            age = age.value,
-            heightCm = heightCm.value,
-            weightKg = weightKg.value,
-            gender = gender.value
+            fullName = _fullName.value,
+            age = _age.value,
+            heightCm = _heightCm.value,
+            weightKg = _weightKg.value,
+            gender = _gender.value
         )
+        _isEditing.value = false
+    }
+
+    // ─── Input handlers ────────────────────────────
+    override fun onFullNameChange(value: String) {
+        _fullName.value = value
+    }
+
+    override fun onAgeChange(value: Int) {
+        _age.value = value
+    }
+
+    override fun onHeightChange(value: Double) {
+        _heightCm.value = value
+    }
+
+    override fun onWeightChange(value: Double) {
+        _weightKg.value = value
+    }
+
+    override fun onGenderChange(value: String) {
+        _gender.value = value
     }
 
     companion object {
@@ -56,7 +116,11 @@ class ProfileVM(
     }
 }
 
-class FakeProfileVM: ProfileViewModel {
+
+class FakeProfileVM : ProfileViewModel {
+
+    override val isEditing = MutableStateFlow(false)
+
     override val fullName = MutableStateFlow("Preview User")
     override val email = MutableStateFlow("preview@test.com")
     override val age = MutableStateFlow(30)
@@ -65,6 +129,20 @@ class FakeProfileVM: ProfileViewModel {
     override val gender = MutableStateFlow("Male")
 
     override fun onEditProfile() {
-        // no-op
+        isEditing.value = true
     }
+
+    override fun onSaveProfile() {
+        isEditing.value = false
+    }
+
+    override fun onCancelEdit() {
+        isEditing.value = false
+    }
+
+    override fun onFullNameChange(value: String) {}
+    override fun onAgeChange(value: Int) {}
+    override fun onHeightChange(value: Double) {}
+    override fun onWeightChange(value: Double) {}
+    override fun onGenderChange(value: String) {}
 }

@@ -25,6 +25,7 @@ fun ProfileScreen(
     val height by vm.heightCm.collectAsStateWithLifecycle()
     val weight by vm.weightKg.collectAsStateWithLifecycle()
     val gender by vm.gender.collectAsStateWithLifecycle()
+    val isEditing by vm.isEditing.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -54,10 +55,19 @@ fun ProfileScreen(
                 )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = fullName ?: "Unnamed user",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    if (isEditing) {
+                        OutlinedTextField(
+                            value = fullName ?: "",
+                            onValueChange = vm::onFullNameChange,
+                            label = { Text("Name") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else {
+                        Text(
+                            text = fullName ?: "Unnamed user",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
 
                     Divider(
                         thickness = 3.dp,
@@ -77,35 +87,101 @@ fun ProfileScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
 
-                    ProfileItem("Age", age?.toString())
+                    if (isEditing) {
+                        OutlinedTextField(
+                            value = age?.toString() ?: "",
+                            onValueChange = {
+                                it.toIntOrNull()?.let(vm::onAgeChange)
+                            },
+                            label = { Text("Age") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else {
+                        ProfileItem("Age", age?.toString())
+                    }
+
                     Divider(
                         thickness = 3.dp,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
 
-                    ProfileItem("Height", height?.let { "$it cm" })
+                    if (isEditing) {
+                        OutlinedTextField(
+                            value = height?.toString() ?: "",
+                            onValueChange = {
+                                it.toDoubleOrNull()?.let(vm::onHeightChange)
+                            },
+                            label = { Text("Height (cm)") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else {
+                        ProfileItem("Height", height?.let { "$it cm" })
+                    }
+
                     Divider(
                         thickness = 3.dp,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
 
-                    ProfileItem("Weight", weight?.let { "$it kg" })
+                    if (isEditing) {
+                        OutlinedTextField(
+                            value = weight?.toString() ?: "",
+                            onValueChange = {
+                                it.toDoubleOrNull()?.let(vm::onWeightChange)
+                            },
+                            label = { Text("Weight (kg)") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else {
+                        ProfileItem("Weight", weight?.let { "$it kg" })
+                    }
+
                     Divider(
                         thickness = 3.dp,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
 
-                    ProfileItem("Gender", gender)
+                    if (isEditing) {
+                        OutlinedTextField(
+                            value = gender ?: "",
+                            onValueChange = vm::onGenderChange,
+                            label = { Text("Gender") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else {
+                        ProfileItem("Gender", gender)
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Button(
-                onClick = vm::onEditProfile,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Edit profile")
+            if (isEditing) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = vm::onCancelEdit,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Cancel")
+                    }
+
+                    Button(
+                        onClick = vm::onSaveProfile,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Save")
+                    }
+                }
+            } else {
+                Button(
+                    onClick = vm::onEditProfile,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Edit profile")
+                }
             }
         }
     }
