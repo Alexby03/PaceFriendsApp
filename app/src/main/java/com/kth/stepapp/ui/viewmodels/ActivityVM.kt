@@ -12,6 +12,17 @@ import com.kth.stepapp.core.services.TrackingService
 import com.kth.stepapp.data.repositories.TrackingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import android.location.Location
+import android.util.Log
+import androidx.lifecycle.viewModelScope
+import com.kth.stepapp.core.entities.DayEntryDto
+import com.kth.stepapp.core.entities.RoutePointDto
+import com.kth.stepapp.core.services.CaloriesCalculator
+import com.kth.stepapp.core.utils.GeometryUtils
+import com.kth.stepapp.data.repositories.PaceFriendsRepository
+import com.kth.stepapp.data.repositories.PlayerRepository
+import kotlinx.coroutines.launch
+import java.time.Instant
 
 interface ActivityViewModel {
     val nrOfSteps: StateFlow<Long>
@@ -21,11 +32,14 @@ interface ActivityViewModel {
     val isTracking: StateFlow<Boolean>
     val areaInSqMeters: StateFlow<Double>
     val currentActivity: String
-    fun startTracking()
-    fun stopTracking()
+    fun startTracking(activityType: String)
+    fun stopTracking(closedCircuit: Boolean)
+
+    fun tryCompleteArea(): Boolean
 }
 
 class ActivityVM(
+    private val paceFriendsRepository: PaceFriendsRepository,
     private val app: Application,
     activityType: String
 ) : ActivityViewModel, ViewModel() {
@@ -38,19 +52,52 @@ class ActivityVM(
     override val areaInSqMeters = TrackingRepository.areaInSqMeters
     override val currentActivity: String = activityType
 
-    override fun startTracking() {
+    override fun startTracking(activityType: String) {
         Intent(app, TrackingService::class.java).also {
             it.action = "START"
+            it.putExtra("ACTIVITY_TYPE", activityType)
             app.startService(it)
         }
     }
 
-    override fun stopTracking() {
-        Intent(app, TrackingService::class.java).also {
-            it.action = "STOP"
-            app.startService(it)
+    override fun stopTracking(closedCircuit: Boolean) {
+        viewModelScope.launch {
+            try {
+                paceFriendsRepository.syncActivity(
+                    PlayerRepository.playerId.value!!,
+                    DayEntryDto(
+                        date = Instant.now().toString(),
+                        totalSteps = nrOfSteps.value,
+                        totalCalories = caloriesBurned.value.toLong(),
+                        timeSpentSeconds = walkingTimeSeconds.value,
+                        areaInSquareMeters = if (closedCircuit) areaInSqMeters.value else 0.0,
+                        score = 0,
+                        activity = currentActivity,
+                        routePoints = locationUiState.value.pathPoints.mapIndexed { index, pair ->
+                            RoutePointDto(
+                                latitude = pair.first,
+                                longitude = pair.second,
+                                sequenceOrder = index
+                            )
+                        }
+                    )
+                )
+            } catch (e: Exception) {
+                Log.e("Activity", "Failed to sync activity", e)
+            }
+            try {
+                Intent(app, TrackingService::class.java).also {
+                    it.action = "STOP"
+                    app.startService(it)
+                }
+            } catch (e: Exception) {
+                Log.e("Activity", "Failed to stop tracking service", e)
+            }
         }
-        //saveRun()
+    }
+
+    override fun tryCompleteArea(): Boolean {
+        return GeometryUtils.calculateDistance(locationUiState.value.pathPoints) < 30f
     }
 
     companion object {
@@ -60,7 +107,7 @@ class ActivityVM(
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ActivityVM(app, activityType) as T
+                return ActivityVM(PaceFriendsRepository(), app, activityType) as T
             }
         }
     }
@@ -81,7 +128,9 @@ class FakeActivityVM: ActivityViewModel {
 
     override val currentActivity = "Walking"
 
-    override fun startTracking() { }
+    override fun startTracking(activityType: String) { }
 
-    override fun stopTracking() { }
+    override fun stopTracking(closedCircuit: Boolean) { }
+
+    override fun tryCompleteArea(): Boolean { return false }
 }

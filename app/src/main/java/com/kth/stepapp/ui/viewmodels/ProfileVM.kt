@@ -1,14 +1,19 @@
 package com.kth.stepapp.ui.viewmodels
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kth.stepapp.PaceFriendsApplication
+import com.kth.stepapp.core.entities.PlayerDto
+import com.kth.stepapp.data.repositories.PaceFriendsRepository
 import com.kth.stepapp.data.repositories.PlayerRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 interface ProfileViewModel {
 
@@ -33,7 +38,7 @@ interface ProfileViewModel {
 }
 
 class ProfileVM(
-    private val app: Application
+    private val paceFriendsRepository: PaceFriendsRepository,
 ) : ProfileViewModel, ViewModel() {
 
     private val _isEditing = MutableStateFlow(false)
@@ -70,14 +75,40 @@ class ProfileVM(
     }
 
     override fun onSaveProfile() {
-        PlayerRepository.updateProfile(
-            fullName = _fullName.value,
-            age = _age.value,
-            heightCm = _heightCm.value,
-            weightKg = _weightKg.value,
-            gender = _gender.value
-        )
-        _isEditing.value = false
+        viewModelScope.launch {
+            try {
+                val result = paceFriendsRepository.updateUser(PlayerDto(
+                    PlayerRepository.playerId.value,
+                    _fullName.value,
+                    PlayerRepository.email.value,
+                    null,
+                    _age.value,
+                    _heightCm.value,
+                    _weightKg.value,
+                    _gender.value,
+                    PlayerRepository.currentStreak.value,
+                    PlayerRepository.completedDaily.value,
+                    PlayerRepository.weekScore.value,
+                    PlayerRepository.totalTimePlayed.value,
+                    PlayerRepository.weeklySteps.value,
+                    PlayerRepository.lastUpdated.value,
+                    PlayerRepository.totalScore.value,
+                ))
+                if(result != null) {
+                    PlayerRepository.updateProfile(
+                        result.fullName,
+                        result.age,
+                        result.heightCm,
+                        result.weightKg,
+                        result.gender
+                    )
+                    _isEditing.value = false
+                }
+            } catch (e: Exception) {
+                _isEditing.value = false
+                Log.e("Profile", "Failed to update profile", e)
+            }
+        }
     }
 
     override fun onFullNameChange(value: String) {
@@ -106,7 +137,7 @@ class ProfileVM(
                 val app =
                     this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
                             as PaceFriendsApplication
-                ProfileVM(app)
+                ProfileVM(paceFriendsRepository = PaceFriendsRepository())
             }
         }
     }

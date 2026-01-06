@@ -6,4 +6,5 @@ object Routes {
     const val ACTIVITY = "activity/{type}"
     const val CALENDAR = "calendar"
     const val PROFILE = "profile"
+    const val RESULT = "result"
 }

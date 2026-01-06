@@ -1,5 +1,8 @@
 package com.kth.stepapp.core.utils
 
+import android.location.Location
+import android.util.Log
+import java.math.BigDecimal
 import kotlin.math.abs
 import kotlin.math.cos
 
@@ -26,4 +29,22 @@ object GeometryUtils {
 
         return abs(area / 2.0)
     }
+
+    fun calculateDistance(points: List<Pair<Double, Double>>): Float {
+        if (points.size < 3) return 999.0f
+
+        val firstPoint = points.first()
+        val lastPoint = points.last()
+
+        val results = FloatArray(1)
+        Location.distanceBetween(
+            firstPoint.first, firstPoint.second,
+            lastPoint.first, lastPoint.second,
+            results
+        )
+        val distanceInMeters = results[0]
+        Log.d("tryCompleteArea", "distanceInMeters: $distanceInMeters")
+        return distanceInMeters
+    }
+
 }

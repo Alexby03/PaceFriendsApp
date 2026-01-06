@@ -1,29 +1,32 @@
 package com.kth.stepapp.core.services
 
+import com.kth.stepapp.data.repositories.PlayerRepository
 import kotlin.math.roundToInt
 
 class CaloriesCalculator {
 
     companion object {
         private const val WALKING_MET = 3.5
-        private const val WALKING_SPEED_KMH = 5.0
-
-        // Placeholders until user input
-        private const val PLACEHOLDER_HEIGHT_CM = 175
-        private const val PLACEHOLDER_WEIGHT_KG = 70
-        private const val STEP_LENGTH_FACTOR = 0.415
+        private const val JOGGING_MET = 7.0
+        private const val RUNNING_MET = 10.0
     }
 
     fun calculateCalories(
         steps: Long,
-        walkingTimeSeconds: Long
+        walkingTimeSeconds: Long,
+        activity: String
     ): Int {
         if (steps <= 0 || walkingTimeSeconds <= 0) return 0
 
         val timeHours = walkingTimeSeconds / 3600.0
 
-        // MET-based calculation (time is the key factor)
-        return (WALKING_MET * PLACEHOLDER_WEIGHT_KG * timeHours)
-            .roundToInt()
+        val metValue = when (activity) {
+            "Walking" -> WALKING_MET
+            "Jogging" -> JOGGING_MET
+            "Running" -> RUNNING_MET
+            else -> WALKING_MET
+        }
+
+        return (metValue * PlayerRepository.weightKg.value * timeHours).roundToInt()
     }
 }

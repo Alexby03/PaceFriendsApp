@@ -37,7 +37,8 @@ import kotlin.text.format
 @Composable
 fun ActivityScreen(
     vm: ActivityViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onResult: () -> Unit
 ) {
     val steps by vm.nrOfSteps.collectAsState()
     val calories by vm.caloriesBurned.collectAsState()
@@ -50,6 +51,7 @@ fun ActivityScreen(
     val context = LocalContext.current
     val isPreview = LocalInspectionMode.current
 
+    var showWarningDialog by remember { mutableStateOf(false) }
     var hasPermissions by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -83,7 +85,7 @@ fun ActivityScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Test Screen") },
+                title = { Text("") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -122,6 +124,34 @@ fun ActivityScreen(
     ) { padding ->
 
         Column(modifier = Modifier.fillMaxSize()) {
+
+            if (showWarningDialog) {
+                AlertDialog(
+                    onDismissRequest = { showWarningDialog = false },
+                    title = { Text(text = "Circuit not closed") },
+                    text = { Text(text = "If you don't finish your loop, your area will count as 0 m²!") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                showWarningDialog = false
+                                vm.stopTracking(false)
+                                onResult()
+                            }
+                        ) {
+                            Text("OK")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                showWarningDialog = false
+                            }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
 
             Column(
                 modifier = Modifier
@@ -170,7 +200,16 @@ fun ActivityScreen(
                 } else {
                     Button(
                         onClick = {
-                            if (isTracking) vm.stopTracking() else vm.startTracking()
+                            if (isTracking) {
+                                if (!vm.tryCompleteArea()) {
+                                    showWarningDialog = true
+                                } else {
+                                    vm.stopTracking(true)
+                                    onResult()
+                                }
+                            } else {
+                                vm.startTracking(vm.currentActivity)
+                            }
                         },
                         colors = if (isTracking)
                             ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)

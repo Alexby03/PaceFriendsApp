@@ -3,7 +3,6 @@ package com.kth.stepapp.core.services
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.kth.stepapp.PaceFriendsApplication
 import com.kth.stepapp.data.repositories.TrackingRepository
@@ -11,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.kth.stepapp.R
 import com.kth.stepapp.core.utils.GeometryUtils
@@ -34,12 +32,15 @@ class TrackingService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent?.action
-        if (action == "START") start()
+        if (action == "START") {
+            val activityType = intent.getStringExtra("ACTIVITY_TYPE") ?: "Walking"
+            start(activityType)
+        }
         if (action == "STOP") stop()
         return START_STICKY
     }
 
-    private fun start() {
+    private fun start(activityType: String) {
         val notification = NotificationCompat.Builder(this, "TRACKING_CHANNEL")
             .setContentTitle("Tracking current session...")
             .setSmallIcon(R.mipmap.ic_launcher)
@@ -64,7 +65,8 @@ class TrackingService : Service() {
                 val currentSeconds = TrackingRepository.walkingTimeSeconds.value
                 val calories = caloriesCalculator.calculateCalories(
                     steps = steps,
-                    walkingTimeSeconds = currentSeconds
+                    walkingTimeSeconds = currentSeconds,
+                    activityType
                 )
                 TrackingRepository.updateMetrics(steps, calories)
             }
