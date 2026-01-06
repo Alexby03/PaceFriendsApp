@@ -36,11 +36,9 @@ class ProfileVM(
     private val app: Application
 ) : ProfileViewModel, ViewModel() {
 
-    // ─── Edit state ────────────────────────────────
     private val _isEditing = MutableStateFlow(false)
     override val isEditing: StateFlow<Boolean> = _isEditing
 
-    // ─── Editable fields (kopierade från repository) ─
     private val _fullName = MutableStateFlow(PlayerRepository.fullName.value)
     override val fullName: StateFlow<String> = _fullName
 
@@ -58,7 +56,6 @@ class ProfileVM(
     private val _gender = MutableStateFlow(PlayerRepository.gender.value)
     override val gender: StateFlow<String> = _gender
 
-    // ─── Edit lifecycle ────────────────────────────
     override fun onEditProfile() {
         _isEditing.value = true
     }
@@ -83,7 +80,6 @@ class ProfileVM(
         _isEditing.value = false
     }
 
-    // ─── Input handlers ────────────────────────────
     override fun onFullNameChange(value: String) {
         _fullName.value = value
     }
