@@ -21,7 +21,7 @@ interface HomeViewModel {
     val weeklySteps: StateFlow<Long>
     val weeklyScore: StateFlow<Long>
     val streak: StateFlow<Int>
-    val daylilyComplete: StateFlow<Boolean>
+    val dailyComplete: StateFlow<Boolean>
     fun logoutPlayer()
 }
 
@@ -38,7 +38,7 @@ class HomeVM (
 
     override val streak: StateFlow<Int> = PlayerRepository.currentStreak
 
-    override val daylilyComplete: StateFlow<Boolean> = PlayerRepository.completedDaily
+    override val dailyComplete: StateFlow<Boolean> = PlayerRepository.completedDaily
 
     override fun logoutPlayer() {
         PlayerRepository.logout()
@@ -69,6 +69,6 @@ class FakeHomeVM : HomeViewModel {
     override val weeklySteps = MutableStateFlow(42_000L)
     override val weeklyScore = MutableStateFlow(12_340L)
     override val streak = MutableStateFlow(5)
-    override val daylilyComplete = MutableStateFlow(true)
+    override val dailyComplete = MutableStateFlow(true)
     override fun logoutPlayer() { }
 }

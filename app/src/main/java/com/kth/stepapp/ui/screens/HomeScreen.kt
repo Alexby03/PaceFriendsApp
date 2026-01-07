@@ -30,7 +30,7 @@ fun HomeScreen(
     val weeklySteps by vm.weeklySteps.collectAsState()
     val weeklyScore by vm.weeklyScore.collectAsState()
     val streak by vm.streak.collectAsState()
-    val dailyComplete by vm.daylilyComplete.collectAsState()
+    val dailyComplete by vm.dailyComplete.collectAsState()
 
     Scaffold(
         topBar = {
